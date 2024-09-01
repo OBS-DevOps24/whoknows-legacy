@@ -1,7 +1,7 @@
 .PHONY: init run test
 
 init:
-	PYTHONPATH=backend python2 -c "from app import init_db; init_db()"
+	PYTHONPATH=backend python -c "from app import init_db; init_db()"
 
 run:
 	python ./backend/app.py

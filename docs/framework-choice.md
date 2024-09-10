@@ -6,13 +6,12 @@ This document summarizes the considerations from our discussions on selecting a 
 
 ## Conclusion
 
-After evaluating the various options, we have chosen C# with ASP.NET Core and Razor Pages for our project. This decision was guided by several key factors:
+After evaluating the various options, we have chosen C# with ASP.NET Core for the backend and React for the frontend. This decision was guided by several key factors:
 
-- Maintainability: The full-stack C# approach reduces the need to manage multiple languages or frameworks, simplifying the codebase. The integration of Razor Pages with ASP.NET Core allows for more consistent and maintainable code.
+- Maintainability: The separation of concerns between the backend and frontend allows for more modular and maintainable code. React's component-based architecture further enhances maintainability.
 - Scalability: ASP.NET Core's modern, high-performance architecture ensures that the application can scale effectively as demand grows.
 - Security: With ASP.NET Core’s built-in security features, such as authentication and protection against common web vulnerabilities, the framework provides robust security out of the box.
-- Ease of development: Razor Pages’ tight integration with the backend streamlines development, reducing overhead and enabling rapid feature iteration.
-While Razor Pages may present some limitations in terms of client-side interactivity and complexity for dynamic UIs, we believe that the benefits of server-side rendering, simplicity, and strong tooling outweigh these concerns, especially given the nature of our project. For future needs, client-side interactivity can be supplemented with JavaScript frameworks or libraries.
+- Ease of development: React's declarative approach and rich ecosystem simplify the development of dynamic and interactive user interfaces. The API-first architecture allows for clear separation between frontend and backend, enabling flexibility for future changes.
 
 This framework meets the project’s objectives for maintainability, scalability, security, and ease of development, making it the optimal choice for the rewrite.
 

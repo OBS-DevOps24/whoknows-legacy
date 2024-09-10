@@ -1,20 +1,16 @@
 import "./index.css";
+import Layout from "./Layout";
+import { Routes, Route } from "react-router-dom";
+import About from "./pages/about/About";
 
 function App() {
   return (
-    // React router example
-    // <Layout>
-    //   <Routes>
-    //     <Route path="/" element={<Home />} />
-    //   </Routes>
-    // </Layout>
-    <>
-      <div className="w-full h-screen">
-        <div className="flex items-center justify-center w-full h-full">
-          <p className="text-4xl">placeholder</p>
-        </div>
-      </div>
-    </>
+
+    <Layout>
+      <Routes>
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </Layout>
   );
 }
 

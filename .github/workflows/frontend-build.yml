@@ -3,11 +3,12 @@
 
 name: Frontend Build
 
+permissions:
+  checks: write
+  pull-requests: write
+
 on:
-  push:
-    branches: ["main"]
   pull_request:
-    branches: ["main"]
 
 jobs:
   build:
@@ -25,5 +26,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm install
-      - run: npm run build
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm install
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm run build

@@ -2,10 +2,12 @@
 
 name: .NET Build and Test
 
+permissions:
+  checks: write
+  pull-requests: write
+
 on:
   pull_request:
-    branches:
-      - main
 
 jobs:
   build:
@@ -23,10 +25,13 @@ jobs:
           dotnet-version: "8.x"
 
       - name: Install dependencies
+        working-directory: ./backend
         run: dotnet restore
 
       - name: Build
+        working-directory: ./backend
         run: dotnet build
 
       - name: Test with the dotnet CLI
+        working-directory: ./backend
         run: dotnet test

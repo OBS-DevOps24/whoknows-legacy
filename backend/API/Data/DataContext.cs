@@ -10,5 +10,6 @@ namespace API.Data
         }
 
         public DbSet<Page> Pages { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

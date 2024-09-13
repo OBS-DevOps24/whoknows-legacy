@@ -14,7 +14,7 @@ namespace API.Controllers
         }
 
         [HttpGet(Name = "GetSearch")]
-        public IActionResult GetSearchResults([FromQuery] string q)
+        public IActionResult GetSearchResults([FromQuery] string q, [FromQuery] string language = "en")
         {
             if (string.IsNullOrEmpty(q))
             {

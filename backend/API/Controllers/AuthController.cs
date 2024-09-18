@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using API.Interfaces;
+using API.Models;
+using API.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
@@ -7,18 +10,28 @@ namespace API.Controllers
     public class AuthController : Controller
     {
         private readonly ILogger<AuthController> _logger;
-        
-        public AuthController(ILogger<AuthController> logger)
+        private readonly IAuthService _authService;
+
+        public AuthController(ILogger<AuthController> logger, IAuthService authService)
         {
             _logger = logger;
+            _authService = authService;
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] object registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
-            // Registration logic goes here
-            _logger.LogInformation("Registration attempt");
-            return Ok(new { message = "User registered successfully", userId = 1 });
+            (bool success, string message) = await _authService.RegisterAsync(registerDTO);
+            if (success)
+            {
+                _logger.LogInformation("User registered successfully");
+                return Ok(new { message });
+            }
+            else
+            {
+                _logger.LogInformation("Registration attempt failed");
+                return BadRequest(new { message });
+            }
         }
 
         [HttpPost("login")]

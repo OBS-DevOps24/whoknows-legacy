@@ -1,6 +1,7 @@
 using API.Data;
 using API.Interfaces;
 using API.Repositories;
+using API.Services;
 using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,8 @@ builder.Services.AddSwaggerGen();
 
 // Interfaces and implementations
 builder.Services.AddScoped<IPageRepository, PageRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Load configuration from .env file
 DotEnv.Load();

@@ -18,9 +18,19 @@ builder.Services.AddScoped<IPageRepository, PageRepository>();
 
 // Load configuration from .env file
 DotEnv.Load();
-string connectionString = Environment.GetEnvironmentVariable("ConnectionString")
-    ?? throw new InvalidOperationException("Connection string not found.");
 
+string server = Environment.GetEnvironmentVariable("Server")
+    ?? throw new InvalidOperationException("Server not found.");
+string port = Environment.GetEnvironmentVariable("Port")
+    ?? throw new InvalidOperationException("Port not found.");
+string database = Environment.GetEnvironmentVariable("Database")
+    ?? throw new InvalidOperationException("Database not found.");
+string user = Environment.GetEnvironmentVariable("User");
+string password = Environment.GetEnvironmentVariable("Pwd");
+
+string connectionString = $"server={server};port={port};database={database};user={user};password={password}";
+
+Console.WriteLine($"Connection string: {connectionString}");
 // Configure the database
 builder.Services.AddDbContext<DataContext>(options => 
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))

@@ -47,3 +47,37 @@ jobs:
           context: ./nginx
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/proxyimage:latest
+
+  deploy-app-to-production:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: SSH to server1
+        uses: appleboy/ssh-action@v1
+        with:
+          ## TODO: Add your server IP, username and private key
+          host: ${{ secrets.VM_IP_1 }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ./app
+            sudo docker compose down
+            sudo docker compose pull
+            sudo docker compose up -d
+
+  deploy-db-to-production:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: SSH to server2
+        uses: appleboy/ssh-action@v1
+        with:
+          ## TODO: Add your server IP, username and private key
+          host: ${{ secrets.VM_IP_2 }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ./app
+            sudo docker compose down
+            sudo docker compose pull
+            sudo docker compose up -d

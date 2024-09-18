@@ -4,6 +4,6 @@ namespace API.Interfaces
 {
     public interface IPageRepository
     {
-        Task<Page> GetByTitleAsync(string title);
+        Task<List<Page>> GetByContent(string? q, string? lang);
     }
 }

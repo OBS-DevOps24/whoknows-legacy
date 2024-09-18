@@ -3,7 +3,7 @@
 namespace API.Controllers
 {
     [ApiController]
-    [Route("/api/auth")]
+    [Route("/api")]
     public class AuthController : Controller
     {
         private readonly ILogger<AuthController> _logger;

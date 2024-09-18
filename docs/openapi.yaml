@@ -14,17 +14,6 @@ paths:
             text/html:
               schema:
                 type: string
-  /weather:
-    get:
-      summary: Serve Weather Page
-      operationId: serve_weather_page_weather_get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            text/html:
-              schema:
-                type: string
   /register:
     get:
       summary: Serve Register Page
@@ -81,17 +70,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/RequestValidationError'
           description: Unprocessable Entity
-  /api/weather:
-    get:
-      summary: Weather
-      operationId: weather_api_weather_get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StandardResponse'
   /api/register:
     post:
       summary: Register

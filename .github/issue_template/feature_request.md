@@ -24,7 +24,7 @@ Please check the areas that may be impacted by this feature:
 - [ ] Security
 - [ ] Accessibility
 - [ ] Data Management
-- [ ] Other: ________________
+- [ ] Other: (please specify)
 
 ## Checklist
 - [ ] I have searched for similar feature requests before creating this one.

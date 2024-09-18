@@ -33,7 +33,7 @@ Please check the appropriate boxes and provide version information:
   - [ ] Firefox
   - [ ] Safari
   - [ ] Edge
-  - [ ] Other: ________________
+  - [ ] Other: (please specify)
 
 ## Additional context
 Add any other context about the problem here.

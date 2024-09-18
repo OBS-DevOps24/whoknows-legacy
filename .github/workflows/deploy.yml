@@ -25,7 +25,7 @@ jobs:
         with:
           context: ./db
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/dbimage:${{ github.ref_name }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/dbimage:latest
 
       - name: Build and push backendimage
         uses: docker/build-push-action@v6

@@ -2,6 +2,10 @@ name: Deploy to docker hub
 
 on:
   push:
+    branches:
+      - main
+  workflow_dispatch:
+    manual: true
 
 jobs:
   build:
@@ -61,8 +65,11 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ./app
+            echo "Stopping the application"
             docker compose down
+            echo "Pulling latest images from Docker Hub"
             docker compose pull
+            echo "Starting the application"
             docker compose up -d
 
   deploy-db-to-production:
@@ -78,6 +85,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ./app
+            echo "Stopping the application"
             docker compose down
+            echo "Pulling latest images from Docker Hub"
             docker compose pull
+            echo "Starting the application"
             docker compose up -d

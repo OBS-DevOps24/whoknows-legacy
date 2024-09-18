@@ -36,7 +36,7 @@ paths:
             text/html:
               schema:
                 type: string
-  /api/Search:
+  /api/search:
     get:
       summary: Search
       operationId: search_api_search_get
@@ -70,7 +70,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RequestValidationError'
           description: Unprocessable Entity
-  /api/auth/register:
+  /api/register:
     post:
       summary: Register
       operationId: register_api_register_post
@@ -93,7 +93,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /api/auth/login:
+  /api/login:
     post:
       summary: Login
       operationId: login_api_login_post
@@ -116,7 +116,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /api/auth/logout:
+  /api/logout:
     get:
       summary: Logout
       operationId: logout_api_logout_get

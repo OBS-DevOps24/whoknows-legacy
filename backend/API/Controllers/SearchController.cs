@@ -3,7 +3,7 @@
 namespace API.Controllers
 {
     [ApiController]
-    [Route("/api/"+"[controller]")]
+    [Route("/api/search")]
     public class SearchController : Controller
     {
         private readonly ILogger<SearchController> _logger;

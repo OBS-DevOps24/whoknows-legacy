@@ -53,7 +53,7 @@ jobs:
     needs: build
     steps:
       - name: SSH to server1
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@v1.0.3
         with:
           ## TODO: Add your server IP, username and private key
           host: ${{ secrets.VM_IP_1 }}

@@ -1,6 +1,7 @@
 using API.Data;
 using API.Interfaces;
 using API.Repositories;
+using API.Services;
 using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ builder.Services.AddSwaggerGen();
 
 // Interfaces and implementations
 builder.Services.AddScoped<IPageRepository, PageRepository>();
+builder.Services.AddScoped<IPageService, PageService>();
 
 // Load configuration from .env file
 DotEnv.Load();
@@ -30,7 +32,6 @@ string password = Environment.GetEnvironmentVariable("Pwd");
 
 string connectionString = $"server={server};port={port};database={database};user={user};password={password}";
 
-Console.WriteLine($"Connection string: {connectionString}");
 // Configure the database
 builder.Services.AddDbContext<DataContext>(options => 
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))

@@ -28,6 +28,8 @@ builder.Services.AddSwaggerGen();
 
 // Interfaces and implementations
 builder.Services.AddScoped<IPageRepository, PageRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPageService, PageService>();
 
 // Load configuration from .env file

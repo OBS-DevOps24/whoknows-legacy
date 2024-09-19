@@ -1,6 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import { PageType } from "../../interfaces/types";
 import { useEffect, useState } from "react";
+import { getSearchResults } from "../../services/apiFacade";
 
 // Type for search result item
 export default function SearchResults() {
@@ -8,16 +9,13 @@ export default function SearchResults() {
   const [results, setResults] = useState<PageType[]>([]);
 
   useEffect(() => {
-    // FETCH DATA FROM API
     if (!searchParams.get("q")) {
       setResults([]);
       return;
     }
-    fetch(`http://localhost:5243/api/search?q=${searchParams.get("q")}`)
-      .then(response => response.json())
-      .then(data => {
-        setResults(data);
-      });
+    getSearchResults(searchParams.get("q") as string).then(data => {
+      setResults(data);
+    });
   }, [searchParams]);
 
   return (

@@ -4,14 +4,13 @@ import { Routes, Route } from "react-router-dom";
 import About from "./pages/about/About";
 import Register from "./pages/register/Register";
 import Login from "./pages/login/Login";
-import Search from "./pages/search/Search";
+import SearchPage from "./pages/search/SearchPage";
 
 function App() {
   return (
-
     <Layout>
       <Routes>
-        <Route path="/" element={<Search />} />
+        <Route path="/" element={<SearchPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />

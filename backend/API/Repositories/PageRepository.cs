@@ -14,9 +14,13 @@ namespace API.Repositories
             _context = context;
         }
 
-        public async Task<Page> GetByTitleAsync(string title)
+        public async Task<List<Page>> GetByContent(string? q, string? lang)
         {
-            return await _context.Pages.FirstOrDefaultAsync(p => p.Title == title);
+            if (string.IsNullOrEmpty(q))
+            {
+                return new List<Page>();
+            }
+            return await _context.Pages.Where(p => p.Content.Contains(q) && p.Language.Equals(lang)).ToListAsync();
         }
     }
 }

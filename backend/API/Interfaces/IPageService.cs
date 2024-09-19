@@ -2,7 +2,7 @@
 
 namespace API.Interfaces
 {
-    public interface IPageRepository
+    public interface IPageService
     {
         Task<List<Page>> GetByContent(string? q, string? lang);
     }

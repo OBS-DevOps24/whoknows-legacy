@@ -6,5 +6,6 @@ namespace API.Interfaces
     {
         Task<User> GetUserByIdAsync(int id);
         Task<User> GetUserByUsernameAsync(string username);
+        Task<User> GetUserByEmailAsync(string email);
     }
 }

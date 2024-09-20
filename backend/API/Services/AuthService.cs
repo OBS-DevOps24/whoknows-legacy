@@ -65,6 +65,12 @@ namespace API.Services
                 });
         }
 
+        // Logout logic
+        public async Task SignOutAsync(HttpContext httpContext)
+        {
+            await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+
         // Authentication logic
         public async Task<User> AuthenticateUserAsync(string username, string password)
         {

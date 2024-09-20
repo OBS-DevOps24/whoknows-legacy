@@ -3,6 +3,7 @@ using API.Interfaces;
 using API.Repositories;
 using API.Services;
 using dotenv.net;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,19 @@ builder.Services.AddScoped<IPageRepository, PageRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPageService, PageService>();
+
+// Authentication configuration
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        // Cookie settings
+        options.Cookie.HttpOnly = true;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.LoginPath = "/api/login";
+        options.LogoutPath = "/api/logout";
+        // Keep extending the cookie as long as the user is active
+        options.SlidingExpiration = true;
+    });
 
 // Load configuration from .env file
 DotEnv.Load();
@@ -65,6 +79,7 @@ app.UseCors(MyAllowSpecificOrigins);
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

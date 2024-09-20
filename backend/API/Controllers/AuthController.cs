@@ -1,7 +1,11 @@
 ﻿using API.Interfaces;
 using API.Models;
+using API.Models.Dtos;
 using API.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -35,11 +39,19 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] object loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
-            // Login logic goes here
-            _logger.LogInformation("Login attempt");
-            return Ok(new { token = "dummy_jwt_token", userId = 1 });
+            var user = await _authService.AuthenticateUserAsync(loginDTO.Username, loginDTO.Password);
+            if (user == null)
+            {
+                _logger.LogInformation("Login attempt failed for user: {Username}", loginDTO.Username);
+                return BadRequest(new { message = "Invalid username or password" });
+            }
+
+            await _authService.SignInAsync(HttpContext, user);
+
+            _logger.LogInformation("User {Username} logged in successfully", loginDTO.Username);
+            return Ok(new { message = "Logged in successfully" });
         }
 
         [HttpGet("logout")]

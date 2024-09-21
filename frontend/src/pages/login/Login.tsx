@@ -1,8 +1,9 @@
+import LoginForm from "./LoginForm";
+
 const Login = () => {
     return (
         <div>
-            <h1>Login</h1>
-            <p>Login form goes here</p>
+            <LoginForm /> 
         </div>
     )
 }

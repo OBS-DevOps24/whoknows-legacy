@@ -1,4 +1,4 @@
-import { PageType, RegisterFormData } from "../interfaces/types";
+import { PageType, RegisterFormData, LoginFormData } from "../interfaces/types";
 import { API_URL } from "../../Settings";
 import { handleHttpErrors } from "./fetchUtils";
 
@@ -11,21 +11,22 @@ async function getSearchResults(q: string): Promise<PageType[]> {
 }
 
 async function registerUser(username: string, email: string, password: string, password2: string): Promise<RegisterFormData> {
-  const response = await fetch(`${API_URL}/register`, {
+  return fetch(`${API_URL}/register`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email, password, password2 }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Registration failed');
-  }
-
-  return response.json();
+  }).then(handleHttpErrors);
 }
 
-export { getSearchResults, registerUser };
+async function loginUser(username: string, password: string): Promise<LoginFormData> {
+  return fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  }).then(handleHttpErrors);
+}
+
+
+export { getSearchResults, registerUser, loginUser };
+
 

@@ -14,3 +14,8 @@ export type PageType = {
   last_updated: string;
   content: string;
 };
+
+export type LoginFormData = {
+  username: string;
+  password: string;
+};

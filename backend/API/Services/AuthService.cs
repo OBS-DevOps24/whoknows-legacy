@@ -26,6 +26,14 @@ namespace API.Services
             {
                 return (false, "The username is already taken");
             }
+            if (registerDTO.Password != registerDTO.Password2)
+            {
+                return (false, "Passwords do not match");
+            }
+            if (await _userRepository.GetUserByEmailAsync(registerDTO.Email) != null)
+            {
+                return (false, "The email is already registered");
+            }
 
             var user = new User
             {

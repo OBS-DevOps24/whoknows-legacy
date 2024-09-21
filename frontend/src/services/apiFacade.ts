@@ -4,6 +4,7 @@ import { handleHttpErrors } from "./fetchUtils";
 
 // DEFINE ENDPOINTS
 const SEARCH_URL = API_URL + "/search";
+const LOGOUT_URL = API_URL + "/logout";
 
 async function getSearchResults(q: string): Promise<PageType[]> {
   if (!q) return fetch(SEARCH_URL).then(handleHttpErrors);
@@ -26,7 +27,11 @@ async function loginUser(username: string, password: string): Promise<LoginFormD
   }).then(handleHttpErrors);
 }
 
+async function logoutUser(): Promise<void> {
+  return fetch(LOGOUT_URL).then(handleHttpErrors);
+}
 
-export { getSearchResults, registerUser, loginUser };
+export { getSearchResults, registerUser, loginUser, logoutUser };
+
 
 

@@ -4,7 +4,6 @@ import { handleHttpErrors } from "./fetchUtils";
 
 // DEFINE ENDPOINTS
 const SEARCH_URL = API_URL + "/search";
-const LOGOUT_URL = API_URL + "/logout";
 
 async function getSearchResults(q: string): Promise<PageType[]> {
   if (!q) return fetch(SEARCH_URL).then(handleHttpErrors);
@@ -22,16 +21,37 @@ async function registerUser(username: string, email: string, password: string, p
 async function loginUser(username: string, password: string): Promise<LoginFormData> {
   return fetch(`${API_URL}/login`, {
     method: "POST",
+    credentials: 'include',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   }).then(handleHttpErrors);
 }
 
 async function logoutUser(): Promise<void> {
-  return fetch(LOGOUT_URL).then(handleHttpErrors);
+  return fetch(`${API_URL}/logout`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then(handleHttpErrors);
 }
 
-export { getSearchResults, registerUser, loginUser, logoutUser };
+async function isUserLoggedIn(): Promise<boolean> {
+  return fetch(`${API_URL}/is-logged-in`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(handleHttpErrors)
+  .then(data => data.isLoggedIn);
+}
+
+export { getSearchResults, registerUser, loginUser, logoutUser, isUserLoggedIn };
+
+
 
 
 

@@ -1,28 +1,31 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { logoutUser } from './services/apiFacade';
-import { useState } from 'react';
+import { useAuth } from './context/AuthContext';
 
 const Header = () => {
   const navigate = useNavigate();
-  //const [user, setUser] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, logout } = useAuth();
 
-
-  const handleLogout = () => {
-    logoutUser().then(() => {
-      setIsLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
       navigate('/');
-    });
-
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   return (
     <div className="navigation">
-      <nav className="flex justify-between items-center p-4">
-        <h1 className="text-2xl font-bold underline">
-          <Link id="nav-logo" to="/">¿Who Knows?</Link>
-        </h1>
-        <div>
+      <nav className="flex items-center p-4">
+        <div className="flex-1 flex justify-start">
+          {/* This empty div maintains layout balance */}
+        </div>
+        <div className="flex-1 flex justify-center">
+          <h1 className="text-2xl font-bold underline">
+            <Link id="nav-logo" to="/">¿Who Knows?</Link>
+          </h1>
+        </div>
+        <div className="flex-1 flex justify-end">
           {isLoggedIn ? (
             <button id="nav-logout" onClick={handleLogout} className="text-blue-500 hover:text-blue-700">
               Log out

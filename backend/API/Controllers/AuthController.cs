@@ -57,5 +57,12 @@ namespace API.Controllers
             await _authService.SignOutAsync(HttpContext);
             return Ok(new { message = "Logged out successfully" });
         }
+
+        [HttpGet("is-logged-in")]
+        public IActionResult IsLoggedIn()
+        {
+            return Ok(new { isLoggedIn = User.Identity.IsAuthenticated });
+        }
     }
 }
+

@@ -31,6 +31,11 @@ builder.Services.AddScoped<IPageRepository, PageRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPageService, PageService>();
+builder.Services.AddScoped<IWeatherService, WeatherService>();
+builder.Services.AddScoped<IGeocodingService, GeocodingService>();
+
+// 
+builder.Services.AddHttpClient();
 
 // Load configuration from .env file
 DotEnv.Load();

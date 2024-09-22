@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace API.Tests
+namespace API.Tests.Controllers
 {
     public class AuthControllerTests
     {

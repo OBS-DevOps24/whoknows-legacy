@@ -14,3 +14,15 @@ export type PageType = {
   last_updated: string;
   content: string;
 };
+
+export type WeatherType = {
+  latitude: number;
+  longitude: number;
+  time: string;
+  country: string;
+  city: string;
+  temperatureUnit: string;
+  temperatureValue: number;
+  windSpeedUnit: string;
+  windSpeedValue: number;
+};

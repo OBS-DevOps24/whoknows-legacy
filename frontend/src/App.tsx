@@ -5,6 +5,7 @@ import About from "./pages/about/About";
 import Register from "./pages/register/Register";
 import Login from "./pages/login/Login";
 import SearchPage from "./pages/search/SearchPage";
+import Weather from "./pages/weather/Weather";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/weather" element={<Weather />} />
       </Routes>
     </Layout>
   );

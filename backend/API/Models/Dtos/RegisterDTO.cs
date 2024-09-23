@@ -14,6 +14,6 @@ namespace API.Models
         [Required]
         public string Password { get; set; }
 
-        public string Password2 { get; set; }
+        public string? Password2 { get; set; }
     }
 }

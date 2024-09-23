@@ -15,7 +15,6 @@ namespace API.Models
         public string Password { get; set; }
 
         [Required]
-        [Compare("Password", ErrorMessage = "Passwords do not match")]
-        public string ConfirmPassword { get; set; }
+        public string Password2 { get; set; }
     }
 }

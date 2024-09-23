@@ -30,7 +30,7 @@ namespace API.Tests.Controllers
                 Username = "testuser",
                 Email = "test@example.com",
                 Password = "password123",
-                ConfirmPassword = "password123"
+                Password2 = "password123"
             };
             _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
                 .ReturnsAsync((true, "You were successfully registered and can login now"));
@@ -53,7 +53,7 @@ namespace API.Tests.Controllers
                 Username = "existinguser",
                 Email = "existing@example.com",
                 Password = "password123",
-                ConfirmPassword = "password123"
+                Password2 = "password123"
             };
             _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
                 .ReturnsAsync((false, "The username is already taken"));
@@ -76,7 +76,7 @@ namespace API.Tests.Controllers
                 Username = "testuser",
                 Email = "test@example.com",
                 Password = "password123",
-                ConfirmPassword = "password456"
+                Password2 = "password456"
             };
             _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
                 .ReturnsAsync((false, "Passwords do not match"));

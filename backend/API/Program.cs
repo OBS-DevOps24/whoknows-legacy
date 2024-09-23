@@ -3,6 +3,7 @@ using API.Interfaces;
 using API.Repositories;
 using API.Services;
 using dotenv.net;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,11 +15,13 @@ builder.Services.AddCors(options =>
     options.AddPolicy(MyAllowSpecificOrigins,
         policy =>
         {
-            policy.AllowAnyOrigin()
+            policy.WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
         });
 });
+
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -36,6 +39,19 @@ builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 
 // 
 builder.Services.AddHttpClient();
+
+// Authentication configuration
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        // Cookie settings
+        options.Cookie.HttpOnly = true;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.LoginPath = "/api/login";
+        options.LogoutPath = "/api/logout";
+        // Keep extending the cookie as long as the user is active
+        options.SlidingExpiration = true;
+    });
 
 // Load configuration from .env file
 DotEnv.Load();
@@ -70,6 +86,7 @@ app.UseCors(MyAllowSpecificOrigins);
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

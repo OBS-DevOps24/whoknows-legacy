@@ -1,7 +1,12 @@
 ﻿using API.Interfaces;
 using API.Models;
+using API.Models.Dtos;
 using API.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -24,30 +29,40 @@ namespace API.Controllers
             (bool success, string message) = await _authService.RegisterAsync(registerDTO);
             if (success)
             {
-                _logger.LogInformation("User registered successfully");
                 return Ok(new { message });
             }
             else
             {
-                _logger.LogInformation("Registration attempt failed");
                 return BadRequest(new { message });
             }
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] object loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
-            // Login logic goes here
-            _logger.LogInformation("Login attempt");
-            return Ok(new { token = "dummy_jwt_token", userId = 1 });
+            var user = await _authService.AuthenticateUserAsync(loginDTO.Username, loginDTO.Password);
+            if (user == null)
+            {
+                return BadRequest(new { message = "Invalid username or password" });
+            }
+
+            await _authService.SignInAsync(HttpContext, user);
+            return Ok(new { message = "Logged in successfully" });
         }
 
         [HttpGet("logout")]
-        public IActionResult Logout()
+        [Authorize]
+        public async Task<IActionResult> Logout()
         {
-            // Logout logic goes here
-            _logger.LogInformation("Logout attempt");
+            await _authService.SignOutAsync(HttpContext);
             return Ok(new { message = "Logged out successfully" });
+        }
+
+        [HttpGet("is-logged-in")]
+        public IActionResult IsLoggedIn()
+        {
+            return Ok(new { isLoggedIn = User.Identity.IsAuthenticated });
         }
     }
 }
+

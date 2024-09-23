@@ -26,3 +26,8 @@ export type WeatherType = {
   windSpeedUnit: string;
   windSpeedValue: number;
 };
+
+export type LoginFormData = {
+  username: string;
+  password: string;
+};

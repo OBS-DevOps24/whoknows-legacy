@@ -45,6 +45,28 @@ namespace API.Tests.Controllers
         }
 
         [Fact]
+        public async Task Register_ValidInput_1_Password_ReturnsOkResult()
+        {
+            // Arrange
+            var registerDto = new RegisterDTO
+            {
+                Username = "testuser",
+                Email = "test@example.com",
+                Password = "password123",
+            };
+            _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
+                .ReturnsAsync((true, "You were successfully registered and can login now"));
+
+            // Act
+            var result = await _controller.Register(registerDto);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var message = Assert.IsType<string>(okResult.Value.GetType().GetProperty("message").GetValue(okResult.Value));
+            Assert.Equal("You were successfully registered and can login now", message);
+        }
+
+        [Fact]
         public async Task Register_InvalidInput_ReturnsBadRequest()
         {
             // Arrange

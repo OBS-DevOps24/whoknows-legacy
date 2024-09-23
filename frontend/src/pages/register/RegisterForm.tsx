@@ -78,7 +78,6 @@ const RegisterForm = () => {
             placeholder="Password (repeat)"
             value={password2}
             onChange={(e) => setPassword2(e.target.value)}
-            required
           />
         </div>
         <div>

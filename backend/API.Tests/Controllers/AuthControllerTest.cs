@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace API.Tests
+namespace API.Tests.Controllers
 {
     public class AuthControllerTests
     {
@@ -30,7 +30,7 @@ namespace API.Tests
                 Username = "testuser",
                 Email = "test@example.com",
                 Password = "password123",
-                ConfirmPassword = "password123"
+                Password2 = "password123"
             };
             _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
                 .ReturnsAsync((true, "You were successfully registered and can login now"));
@@ -53,7 +53,7 @@ namespace API.Tests
                 Username = "existinguser",
                 Email = "existing@example.com",
                 Password = "password123",
-                ConfirmPassword = "password123"
+                Password2 = "password123"
             };
             _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
                 .ReturnsAsync((false, "The username is already taken"));
@@ -76,7 +76,7 @@ namespace API.Tests
                 Username = "testuser",
                 Email = "test@example.com",
                 Password = "password123",
-                ConfirmPassword = "password456"
+                Password2 = "password456"
             };
             _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
                 .ReturnsAsync((false, "Passwords do not match"));

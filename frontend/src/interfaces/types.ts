@@ -15,6 +15,18 @@ export type PageType = {
   content: string;
 };
 
+export type WeatherType = {
+  latitude: number;
+  longitude: number;
+  time: string;
+  country: string;
+  city: string;
+  temperatureUnit: string;
+  temperatureValue: number;
+  windSpeedUnit: string;
+  windSpeedValue: number;
+};
+
 export type LoginFormData = {
   username: string;
   password: string;

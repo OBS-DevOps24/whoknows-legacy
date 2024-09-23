@@ -26,7 +26,7 @@ namespace API.Services
             {
                 return (false, "The username is already taken");
             }
-            if (registerDTO.Password != registerDTO.Password2)
+            if (!string.IsNullOrEmpty(registerDTO.Password2) && registerDTO.Password != registerDTO.Password2)
             {
                 return (false, "Passwords do not match");
             }

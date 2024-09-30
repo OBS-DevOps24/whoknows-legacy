@@ -5,6 +5,7 @@ import hashlib
 from datetime import datetime
 from contextlib import closing
 from flask import Flask, request, session, url_for, redirect, render_template, g, flash, jsonify
+from dotenv import load_dotenv
 
 ################################################################################
 # Configuration
@@ -13,7 +14,7 @@ from flask import Flask, request, session, url_for, redirect, render_template, g
 DATABASE_PATH = './whoknows.db'
 PER_PAGE = 30
 DEBUG = False
-SECRET_KEY = 'development key'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 app = Flask(__name__)
 

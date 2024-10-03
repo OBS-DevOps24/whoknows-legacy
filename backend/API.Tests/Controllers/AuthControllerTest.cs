@@ -10,15 +10,13 @@ namespace API.Tests.Controllers
 {
     public class AuthControllerTests
     {
-        private readonly Mock<ILogger<AuthController>> _mockLogger;
         private readonly Mock<IAuthService> _mockAuthService;
         private readonly AuthController _controller;
 
         public AuthControllerTests()
         {
-            _mockLogger = new Mock<ILogger<AuthController>>();
             _mockAuthService = new Mock<IAuthService>();
-            _controller = new AuthController(_mockLogger.Object, _mockAuthService.Object);
+            _controller = new AuthController( _mockAuthService.Object);
         }
 
         [Fact]

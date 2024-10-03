@@ -6,14 +6,12 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("/api/search")]
-    public class SearchController : Controller
+    public class SearchController : ControllerBase
     {
-        private readonly ILogger<SearchController> _logger;
         private readonly IPageService _pageService;
 
-        public SearchController(ILogger<SearchController> logger, IPageService pageService)
+        public SearchController(IPageService pageService)
         {
-            _logger = logger;
             _pageService = pageService;
         }
 

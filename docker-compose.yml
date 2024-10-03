@@ -47,7 +47,7 @@ services:
     container_name: nginx-container
     restart: unless-stopped
     ports:
-      - ${PROXY_PORT}:${PROXY_PORT} # Map port 80 of the host to port 80 of the Nginx container
+      - ${PROXY_PORT}:${PROXY_PORT}
     depends_on:
       - frontend
       - backend

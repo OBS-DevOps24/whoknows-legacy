@@ -97,3 +97,16 @@ jobs:
             docker compose up -d --remove-orphans
             echo "Cleaning up unused containers and resources"
             docker system prune -f
+
+  verify-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Postman CLI
+        run: |
+          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+      - name: Run API tests
+        run: |
+          postman collection run "12623662-324aa063-2fce-430b-aea3-c86a5a7a906c" -e "12623662-8ec22193-4472-49c3-9323-ddc5c03b384e"

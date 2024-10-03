@@ -58,26 +58,6 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/proxyimage:latest
             ${{ secrets.DOCKER_USERNAME }}/proxyimage:${{ github.ref_name }}
 
-  deploy-app-to-production:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: SSH to server1
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          ## TODO: Add your server IP, username and private key
-          host: ${{ secrets.VM_IP_1 }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd ./app
-            echo "Pulling latest images from Docker Hub"
-            docker compose pull
-            echo "Updating containers and removing old ones"
-            docker compose up -d --remove-orphans
-            echo "Cleaning up unused containers and resources"
-            docker system prune -f
-
   deploy-db-to-production:
     runs-on: ubuntu-latest
     needs: build
@@ -98,8 +78,29 @@ jobs:
             echo "Cleaning up unused containers and resources"
             docker system prune -f
 
+  deploy-app-to-production:
+    runs-on: ubuntu-latest
+    needs: [build, deploy-db-to-production]
+    steps:
+      - name: SSH to server1
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          ## TODO: Add your server IP, username and private key
+          host: ${{ secrets.VM_IP_1 }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ./app
+            echo "Pulling latest images from Docker Hub"
+            docker compose pull
+            echo "Updating containers and removing old ones"
+            docker compose up -d --remove-orphans
+            echo "Cleaning up unused containers and resources"
+            docker system prune -f
+
   verify-deployment:
     runs-on: ubuntu-latest
+    needs: [deploy-db-to-production, deploy-app-to-production]
     steps:
       - uses: actions/checkout@v4
       - name: Install Postman CLI

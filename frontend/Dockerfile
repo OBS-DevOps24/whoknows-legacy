@@ -8,6 +8,9 @@ RUN npm install
 
 COPY . .
 
+ARG VITE_DEV_API_BASE_URL
+ARG VITE_MODE
+
 RUN npm run build
 
 FROM nginx:alpine

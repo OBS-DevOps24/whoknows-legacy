@@ -72,9 +72,9 @@ jobs:
           script: |
             cd ./app
             echo "Pulling latest images from Docker Hub"
-            docker compose pull
+            docker compose --profile prod-db pull
             echo "Updating containers and removing old ones"
-            docker compose up -d --remove-orphans
+            docker compose --profile prod-db up -d --remove-orphans
             echo "Cleaning up unused containers and resources"
             docker system prune -f
 
@@ -92,9 +92,9 @@ jobs:
           script: |
             cd ./app
             echo "Pulling latest images from Docker Hub"
-            docker compose pull
+            docker compose --profile prod-app pull
             echo "Updating containers and removing old ones"
-            docker compose up -d --remove-orphans
+            docker compose --profile prod-app up -d --remove-orphans
             echo "Cleaning up unused containers and resources"
             docker system prune -f
 

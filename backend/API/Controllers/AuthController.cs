@@ -12,14 +12,12 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("/api")]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
-        private readonly ILogger<AuthController> _logger;
         private readonly IAuthService _authService;
 
-        public AuthController(ILogger<AuthController> logger, IAuthService authService)
+        public AuthController(IAuthService authService)
         {
-            _logger = logger;
             _authService = authService;
         }
 

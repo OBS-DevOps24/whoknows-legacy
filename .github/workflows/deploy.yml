@@ -79,12 +79,12 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ./app
-            echo "Stopping the application"
-            docker compose down
             echo "Pulling latest images from Docker Hub"
             docker compose pull
-            echo "Starting the application"
-            docker compose up -d
+            echo "Updating containers and removing old ones"
+            docker compose up -d --remove-orphans
+            echo "Cleaning up unused containers and resources"
+            docker system prune -f
 
   deploy-db-to-production:
     runs-on: ubuntu-latest
@@ -99,9 +99,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ./app
-            echo "Stopping the application"
-            docker compose down
             echo "Pulling latest images from Docker Hub"
             docker compose pull
-            echo "Starting the application"
-            docker compose up -d
+            echo "Updating containers and removing old ones"
+            docker compose up -d --remove-orphans
+            echo "Cleaning up unused containers and resources"
+            docker system prune -f

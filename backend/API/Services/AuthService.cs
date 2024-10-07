@@ -14,12 +14,14 @@ namespace API.Services
         private readonly DataContext _context;
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IRedisService _redisService;
 
-        public AuthService(DataContext context, IUserRepository userRepository, IConfiguration configuration)
+        public AuthService(DataContext context, IUserRepository userRepository, IConfiguration configuration, IRedisService redisService)
         {
             _context = context;
             _userRepository = userRepository;
             _configuration = configuration;
+            _redisService = redisService;
         }
 
         // Registration logic
@@ -61,7 +63,18 @@ namespace API.Services
         // Logout logic
         public async Task SignOutAsync(HttpContext httpContext)
         {
-            // Implement token invalidation logic for logout
+            var token = httpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (!string.IsNullOrEmpty(token))
+            {
+                var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
+                var expiration = jwtToken?.ValidTo ?? DateTime.UtcNow;
+                var timeToLive = expiration - DateTime.UtcNow;
+
+                if (timeToLive > TimeSpan.Zero)
+                {
+                    await _redisService.AddToBlacklistAsync(token, timeToLive);
+                }
+            }
         }
 
         // Authentication logic
@@ -111,6 +124,12 @@ namespace API.Services
                     SecurityAlgorithms.HmacSha256)
                 );
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+        }
+
+        // Check if token is in blacklist
+        public async Task<bool> IsTokenBlacklistedAsync(string token)
+        {
+            return await _redisService.IsBlacklistedAsync(token);
         }
     }
 }

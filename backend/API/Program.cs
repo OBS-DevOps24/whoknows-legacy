@@ -6,6 +6,7 @@ using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,7 +62,23 @@ builder.Services.AddAuthentication(cfg => {
         ValidateAudience = false,
         ClockSkew = TimeSpan.Zero
     };
+    x.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var redisService = context.HttpContext.RequestServices.GetRequiredService<IRedisService>();
+            var token = context.SecurityToken as JwtSecurityToken;
+            if (token != null && await redisService.IsBlacklistedAsync(token.RawData))
+            {
+                context.Fail("Token is invalid.");
+            }
+        }
+    };
 });
+
+// Redis configuration
+builder.Services.AddSingleton<IRedisService, RedisService>();
+builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = builder.Configuration["Redis"]; });
 
 // Load configuration from .env file
 DotEnv.Load();

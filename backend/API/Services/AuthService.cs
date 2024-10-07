@@ -1,9 +1,10 @@
 ﻿using API.Data;
 using API.Interfaces;
 using API.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 
 namespace API.Services
@@ -12,11 +13,13 @@ namespace API.Services
     {
         private readonly DataContext _context;
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
 
-        public AuthService(DataContext context, IUserRepository userRepository)
+        public AuthService(DataContext context, IUserRepository userRepository, IConfiguration configuration)
         {
             _context = context;
             _userRepository = userRepository;
+            _configuration = configuration;
         }
 
         // Registration logic
@@ -49,34 +52,16 @@ namespace API.Services
         }
 
         // Login logic
-        public async Task SignInAsync(HttpContext httpContext, User user)
+        public async Task<string> SignInAsync(User user)
         {
-            // Define the claims for the user - this is the information that will be stored in the cookie
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-            };
-
-            // Create a claims identity (of the user) with the claims and the authentication scheme (cookie)
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            await httpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                // Represents the user in the cookie
-                new ClaimsPrincipal(claimsIdentity),
-                new AuthenticationProperties
-                {
-                    // cookie is valid for 30 minutes (persist even if browser is closed)
-                    IsPersistent = true,
-                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
-                });
+            // Generate and return a JWT token
+            return GenerateJWTToken(user);
         }
 
         // Logout logic
         public async Task SignOutAsync(HttpContext httpContext)
         {
-            await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            // Implement token invalidation logic for logout
         }
 
         // Authentication logic
@@ -106,6 +91,26 @@ namespace API.Services
         public bool VerifyPassword(string password, string passwordHash)
         {
             return BCrypt.Net.BCrypt.Verify(password, passwordHash);
+        }
+
+        // JWT token generation
+        public string GenerateJWTToken(User user)
+        {
+            var claims = new List<Claim> {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), // 'sub' for subject
+                new Claim(JwtRegisteredClaimNames.Name, user.Username),
+            };
+            var jwtToken = new JwtSecurityToken(
+                claims: claims,
+                notBefore: DateTime.UtcNow,
+                expires: DateTime.UtcNow.AddMinutes(30),
+                signingCredentials: new SigningCredentials(
+                    new SymmetricSecurityKey(
+                       Encoding.UTF8.GetBytes(_configuration["JWT_Secret"])
+                        ),
+                    SecurityAlgorithms.HmacSha256)
+                );
+            return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }
     }
 }

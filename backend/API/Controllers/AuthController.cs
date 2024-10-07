@@ -1,12 +1,8 @@
 ﻿using API.Interfaces;
 using API.Models;
 using API.Models.Dtos;
-using API.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -43,8 +39,10 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = "Invalid username or password" });
             }
+            var token = await _authService.SignInAsync(user);
 
-            await _authService.SignInAsync(HttpContext, user);
+            // Set the token in the response headers
+            Response.Headers.Add("Authorization", $"Bearer {token}");
             return Ok(new { message = "Logged in successfully" });
         }
 

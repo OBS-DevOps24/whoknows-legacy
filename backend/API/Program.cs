@@ -3,8 +3,10 @@ using API.Interfaces;
 using API.Repositories;
 using API.Services;
 using dotenv.net;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,17 +43,25 @@ builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 builder.Services.AddHttpClient();
 
 // Authentication configuration
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+builder.Services.AddAuthentication(cfg => {
+    cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    cfg.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x => {
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = false;
+    x.TokenValidationParameters = new TokenValidationParameters
     {
-        // Cookie settings
-        options.Cookie.HttpOnly = true;
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.LoginPath = "/api/login";
-        options.LogoutPath = "/api/logout";
-        // Keep extending the cookie as long as the user is active
-        options.SlidingExpiration = true;
-    });
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8
+            .GetBytes(builder.Configuration["JWT_Secret"])
+        ),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 // Load configuration from .env file
 DotEnv.Load();

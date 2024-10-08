@@ -61,18 +61,23 @@ namespace API.Services
         }
 
         // Logout logic
-        public async Task SignOutAsync(HttpContext httpContext)
+        public async Task SignOutAsync(string token)
         {
-            var token = httpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (!string.IsNullOrEmpty(token))
-            {
-                var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
-                var expiration = jwtToken?.ValidTo ?? DateTime.UtcNow;
-                var timeToLive = expiration - DateTime.UtcNow;
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
 
-                if (timeToLive > TimeSpan.Zero)
+            if (jsonToken != null)
+            {
+                var jti = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "jti")?.Value;
+                if (!string.IsNullOrEmpty(jti))
                 {
-                    await _redisService.AddToBlacklistAsync(token, timeToLive);
+                    var expiration = jsonToken.ValidTo;
+                    var timeToLive = expiration - DateTime.UtcNow;
+
+                    if (timeToLive > TimeSpan.Zero)
+                    {
+                        await _redisService.AddToBlacklistAsync(jti, timeToLive);
+                    }
                 }
             }
         }
@@ -109,9 +114,11 @@ namespace API.Services
         // JWT token generation
         public string GenerateJWTToken(User user)
         {
+            var jti = Guid.NewGuid().ToString();
             var claims = new List<Claim> {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), // 'sub' for subject
                 new Claim(JwtRegisteredClaimNames.Name, user.Username),
+                new Claim(JwtRegisteredClaimNames.Jti, jti)
             };
             var jwtToken = new JwtSecurityToken(
                 claims: claims,
@@ -124,12 +131,6 @@ namespace API.Services
                     SecurityAlgorithms.HmacSha256)
                 );
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
-        }
-
-        // Check if token is in blacklist
-        public async Task<bool> IsTokenBlacklistedAsync(string token)
-        {
-            return await _redisService.IsBlacklistedAsync(token);
         }
     }
 }

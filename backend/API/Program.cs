@@ -1,5 +1,6 @@
 using API.Data;
 using API.Interfaces;
+using API.Middleware;
 using API.Repositories;
 using API.Services;
 using dotenv.net;
@@ -114,6 +115,7 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseTokenBlacklistMiddleware();
 app.UseAuthorization();
 
 app.MapControllers();

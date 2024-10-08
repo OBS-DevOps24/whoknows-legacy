@@ -50,14 +50,14 @@ namespace API.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            await _authService.SignOutAsync(HttpContext);
-            return Ok(new { message = "Logged out successfully" });
-        }
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest(new { message = "No token provided" });
+            }
 
-        [HttpGet("is-logged-in")]
-        public IActionResult IsLoggedIn()
-        {
-            return Ok(new { isLoggedIn = User.Identity.IsAuthenticated });
+            await _authService.SignOutAsync(token);
+            return Ok(new { message = "Logged out successfully" });
         }
     }
 }

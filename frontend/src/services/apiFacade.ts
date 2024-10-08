@@ -6,14 +6,15 @@ import {
 } from "../interfaces/types";
 import { API_URL } from "../../Settings";
 import { handleHttpErrors } from "./fetchUtils";
+import axios from "axios";
 
 // DEFINE ENDPOINTS
 const SEARCH_URL = API_URL + "/search";
 const WEATHER_URL = API_URL + "/weather";
 
 async function getSearchResults(q: string): Promise<PageType[]> {
-  if (!q) return fetch(SEARCH_URL).then(handleHttpErrors);
-  return fetch(`${SEARCH_URL}?q=${q}`).then(handleHttpErrors);
+  if (!q) return fetch(SEARCH_URL, { credentials: 'include' }).then(handleHttpErrors);
+  return fetch(`${SEARCH_URL}?q=${q}`, { credentials: 'include' }).then(handleHttpErrors);
 }
 
 async function getWeatherResults(
@@ -21,11 +22,11 @@ async function getWeatherResults(
   country?: string
 ): Promise<WeatherType> {
   if (city && country) {
-    return fetch(`${WEATHER_URL}?city=${city}&country=${country}`).then(
+    return fetch(`${WEATHER_URL}?city=${city}&country=${country}`, { credentials: 'include' }).then(
       handleHttpErrors
     );
   }
-  return fetch(`${WEATHER_URL}`).then(handleHttpErrors);
+  return fetch(`${WEATHER_URL}`, { credentials: 'include' }).then(handleHttpErrors);
 }
 
 async function registerUser(
@@ -38,42 +39,26 @@ async function registerUser(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email, password, password2 }),
+    credentials: 'include',
   }).then(handleHttpErrors);
 }
 
-async function loginUser(
-  username: string,
-  password: string
-): Promise<LoginFormData> {
-  return fetch(`${API_URL}/login`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  }).then(handleHttpErrors);
-}
+const loginUser = async (loginData: LoginFormData): Promise<void> => {
+  await axios.post(`${API_URL}/login`, loginData, { withCredentials: true });
+};
 
-async function logoutUser(): Promise<void> {
-  return fetch(`${API_URL}/logout`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then(handleHttpErrors);
-}
+const logoutUser = async (): Promise<void> => {
+  await axios.get(`${API_URL}/logout`, { withCredentials: true });
+};
 
-async function isUserLoggedIn(): Promise<boolean> {
-  return fetch(`${API_URL}/is-logged-in`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then(handleHttpErrors)
-    .then(data => data.isLoggedIn);
-}
+const checkAuthStatusApi = async (): Promise<boolean> => {
+  try {
+    const response = await axios.get(`${API_URL}/is-logged-in`, { withCredentials: true });
+    return response.data.isLoggedIn;
+  } catch {
+    return false;
+  }
+};
 
 export {
   getSearchResults,
@@ -81,5 +66,5 @@ export {
   registerUser,
   loginUser,
   logoutUser,
-  isUserLoggedIn,
+  checkAuthStatusApi,
 };

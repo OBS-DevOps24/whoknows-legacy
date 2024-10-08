@@ -65,6 +65,11 @@ builder.Services.AddAuthentication(cfg => {
     };
     x.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            context.Token = context.Request.Cookies["token"];
+            return Task.CompletedTask;
+        },
         OnTokenValidated = async context =>
         {
             var redisService = context.HttpContext.RequestServices.GetRequiredService<IRedisService>();

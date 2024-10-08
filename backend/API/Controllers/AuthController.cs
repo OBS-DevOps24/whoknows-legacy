@@ -50,6 +50,10 @@ namespace API.Controllers
         public async Task<IActionResult> Logout()
         {
             var token = Request.Cookies["token"];
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest(new { message = "No token provided" });
+            }
             (bool success, string message) = await _authService.LogoutAsync(token, Response);
             if (success)
             {
@@ -59,6 +63,13 @@ namespace API.Controllers
             {
                 return BadRequest(new { message });
             }
+        }
+
+        [HttpGet("is-logged-in")]
+        public IActionResult IsLoggedIn()
+        {
+            var token = Request.Cookies["token"];
+            return Ok(new { isLoggedIn = !string.IsNullOrEmpty(token) });
         }
     }
 }

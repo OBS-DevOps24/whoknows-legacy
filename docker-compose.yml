@@ -28,6 +28,8 @@ services:
       - Database=${MYSQL_DATABASE}
       - User=${MYSQL_USER}
       - Pwd=${MYSQL_PASSWORD}
+      - Redis=${REDIS_CONNECTION_STRING}
+      - JWT_Secret=${JWT_SECRET}
     networks:
       - webnet
     profiles: ["prod-app"]

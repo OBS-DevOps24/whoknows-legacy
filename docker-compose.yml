@@ -65,7 +65,7 @@ services:
       - ${REDIS_PORT}:${REDIS_PORT}
     networks:
       - webnet
-    profiles: ["prod-app"]
+    profiles: ["prod-redis"]
 
 
 networks:

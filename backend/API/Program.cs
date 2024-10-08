@@ -12,6 +12,10 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load configuration from .env file
+DotEnv.Load();
+builder.Configuration.AddEnvironmentVariables();
+
 // CORS SETTINGS => Allow any origin, header, and method
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
@@ -45,6 +49,8 @@ builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 builder.Services.AddHttpClient();
 
 // Authentication configuration
+var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
+    ?? throw new InvalidOperationException("JWT_SECRET not found.");
 builder.Services.AddAuthentication(cfg => {
     cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -57,7 +63,7 @@ builder.Services.AddAuthentication(cfg => {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8
-            .GetBytes(builder.Configuration["JWT_Secret"])
+            .GetBytes(jwtSecret)
         ),
         ValidateIssuer = false,
         ValidateAudience = false,
@@ -83,11 +89,10 @@ builder.Services.AddAuthentication(cfg => {
 });
 
 // Redis configuration
+var redisConnectionString = Environment.GetEnvironmentVariable("Redis")
+    ?? throw new InvalidOperationException("Redis connection string not found.");
 builder.Services.AddSingleton<IRedisService, RedisService>();
-builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = builder.Configuration["Redis"]; });
-
-// Load configuration from .env file
-DotEnv.Load();
+builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnectionString; });
 
 string server = Environment.GetEnvironmentVariable("Server")
     ?? throw new InvalidOperationException("Server not found.");

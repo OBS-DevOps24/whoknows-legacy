@@ -34,30 +34,31 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
-            var user = await _authService.AuthenticateUserAsync(loginDTO.Username, loginDTO.Password);
-            if (user == null)
+            (bool success, string message) = await _authService.LoginAsync(loginDTO, Response);
+            if (success)
             {
-                return BadRequest(new { message = "Invalid username or password" });
+                return Ok(new { message });
             }
-            var token = await _authService.SignInAsync(user);
-
-            // Set the token in the response headers
-            Response.Headers.Add("Authorization", $"Bearer {token}");
-            return Ok(new { message = "Logged in successfully" });
+            else
+            {
+                return BadRequest(new { message });
+            }
         }
 
         [HttpGet("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-            if (string.IsNullOrEmpty(token))
+            var token = Request.Cookies["token"];
+            (bool success, string message) = await _authService.LogoutAsync(token, Response);
+            if (success)
             {
-                return BadRequest(new { message = "No token provided" });
+                return Ok(new { message });
             }
-
-            await _authService.SignOutAsync(token);
-            return Ok(new { message = "Logged out successfully" });
+            else
+            {
+                return BadRequest(new { message });
+            }
         }
     }
 }

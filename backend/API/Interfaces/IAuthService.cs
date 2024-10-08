@@ -1,14 +1,13 @@
 ﻿using API.Models;
+using API.Models.Dtos;
 
 namespace API.Interfaces
 {
     public interface IAuthService
     {
         Task<(bool Success, string Message)> RegisterAsync(RegisterDTO registerDTO);
-        Task<string> SignInAsync(User user);
-        Task SignOutAsync(string token);
-        Task<User> AuthenticateUserAsync(string username, string password);
-        bool VerifyPassword(string password, string passwordHash);
+        Task<(bool Success, string Message)> LoginAsync(LoginDTO loginDTO, HttpResponse response);
+        Task<(bool Success, string Message)> LogoutAsync(string token, HttpResponse response);
     }
     
 }

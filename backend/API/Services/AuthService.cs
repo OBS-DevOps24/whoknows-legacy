@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Interfaces;
 using API.Models;
+using API.Models.Dtos;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -54,15 +55,26 @@ namespace API.Services
         }
 
         // Login logic
-        public async Task<string> SignInAsync(User user)
+        public async Task<(bool Success, string Message)> LoginAsync(LoginDTO loginDTO, HttpResponse response)
         {
-            // Generate and return a JWT token
-            return GenerateJWTToken(user);
+            var user = await AuthenticateUserAsync(loginDTO.Username, loginDTO.Password);
+            if (user == null)
+            {
+                return (false, "Invalid username or password");
+            }
+            GenerateAndSetHttpOnlyCookie(user, response);
+            return (true, "Logged in successfully");
         }
 
+
         // Logout logic
-        public async Task SignOutAsync(string token)
+        public async Task<(bool Success, string Message)> LogoutAsync(string token, HttpResponse response)
         {
+            if (string.IsNullOrEmpty(token))
+            {
+                return (false, "No token provided");
+            }
+
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
 
@@ -80,7 +92,11 @@ namespace API.Services
                     }
                 }
             }
+
+            response.Cookies.Delete("token");
+            return (true, "Logged out successfully");
         }
+
 
         // Authentication logic
         public async Task<User> AuthenticateUserAsync(string username, string password)
@@ -131,6 +147,20 @@ namespace API.Services
                     SecurityAlgorithms.HmacSha256)
                 );
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+        }
+
+        // Generate and set the JWT token in an HTTP-only cookie
+        public string GenerateAndSetHttpOnlyCookie(User user, HttpResponse response)
+        {
+            var token = GenerateJWTToken(user);
+
+            response.Cookies.Append("token", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                Expires = DateTime.UtcNow.AddMinutes(30)
+            });
+            return token;
         }
     }
 }

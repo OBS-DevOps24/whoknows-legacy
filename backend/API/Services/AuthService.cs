@@ -122,7 +122,7 @@ namespace API.Services
         }
 
         // Password verification
-        public bool VerifyPassword(string password, string passwordHash)
+        public static bool VerifyPassword(string password, string passwordHash)
         {
             return BCrypt.Net.BCrypt.Verify(password, passwordHash);
         }
@@ -142,7 +142,7 @@ namespace API.Services
                 expires: DateTime.UtcNow.AddMinutes(30),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(
-                       Encoding.UTF8.GetBytes(_configuration["JWT_Secret"])
+                       Encoding.UTF8.GetBytes(_configuration["JWT_KEY"])
                         ),
                     SecurityAlgorithms.HmacSha256)
                 );

@@ -33,6 +33,8 @@ services:
     networks:
       - webnet
     profiles: ["prod-app"]
+    depends_on:
+      - redis
 
   frontend:
     image: devobs/frontendimage:latest
@@ -65,7 +67,7 @@ services:
       - ${REDIS_PORT}:${REDIS_PORT}
     networks:
       - webnet
-    profiles: ["prod-redis"]
+    profiles: ["prod-app"]
 
 
 networks:

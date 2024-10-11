@@ -1,9 +1,11 @@
 ﻿using API.Data;
 using API.Interfaces;
 using API.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using API.Models.Dtos;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 
 namespace API.Services
@@ -12,11 +14,15 @@ namespace API.Services
     {
         private readonly DataContext _context;
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
+        private readonly IRedisService _redisService;
 
-        public AuthService(DataContext context, IUserRepository userRepository)
+        public AuthService(DataContext context, IUserRepository userRepository, IConfiguration configuration, IRedisService redisService)
         {
             _context = context;
             _userRepository = userRepository;
+            _configuration = configuration;
+            _redisService = redisService;
         }
 
         // Registration logic
@@ -49,35 +55,48 @@ namespace API.Services
         }
 
         // Login logic
-        public async Task SignInAsync(HttpContext httpContext, User user)
+        public async Task<(bool Success, string Message)> LoginAsync(LoginDTO loginDTO, HttpResponse response)
         {
-            // Define the claims for the user - this is the information that will be stored in the cookie
-            var claims = new List<Claim>
+            var user = await AuthenticateUserAsync(loginDTO.Username, loginDTO.Password);
+            if (user == null)
             {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-            };
-
-            // Create a claims identity (of the user) with the claims and the authentication scheme (cookie)
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            await httpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                // Represents the user in the cookie
-                new ClaimsPrincipal(claimsIdentity),
-                new AuthenticationProperties
-                {
-                    // cookie is valid for 30 minutes (persist even if browser is closed)
-                    IsPersistent = true,
-                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
-                });
+                return (false, "Invalid username or password");
+            }
+            GenerateAndSetHttpOnlyCookie(user, response);
+            return (true, "Logged in successfully");
         }
+
 
         // Logout logic
-        public async Task SignOutAsync(HttpContext httpContext)
+        public async Task<(bool Success, string Message)> LogoutAsync(string token, HttpResponse response)
         {
-            await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (string.IsNullOrEmpty(token))
+            {
+                return (false, "No token provided");
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            if (jsonToken != null)
+            {
+                var jti = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "jti")?.Value;
+                if (!string.IsNullOrEmpty(jti))
+                {
+                    var expiration = jsonToken.ValidTo;
+                    var timeToLive = expiration - DateTime.UtcNow;
+
+                    if (timeToLive > TimeSpan.Zero)
+                    {
+                        await _redisService.AddToBlacklistAsync(jti, timeToLive);
+                    }
+                }
+            }
+
+            response.Cookies.Delete("token");
+            return (true, "Logged out successfully");
         }
+
 
         // Authentication logic
         public async Task<User> AuthenticateUserAsync(string username, string password)
@@ -103,9 +122,45 @@ namespace API.Services
         }
 
         // Password verification
-        public bool VerifyPassword(string password, string passwordHash)
+        public static bool VerifyPassword(string password, string passwordHash)
         {
             return BCrypt.Net.BCrypt.Verify(password, passwordHash);
+        }
+
+        // JWT token generation
+        public string GenerateJWTToken(User user)
+        {
+            var jti = Guid.NewGuid().ToString();
+            var claims = new List<Claim> {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), // 'sub' for subject
+                new Claim(JwtRegisteredClaimNames.Name, user.Username),
+                new Claim(JwtRegisteredClaimNames.Jti, jti)
+            };
+            var jwtToken = new JwtSecurityToken(
+                claims: claims,
+                notBefore: DateTime.UtcNow,
+                expires: DateTime.UtcNow.AddMinutes(30),
+                signingCredentials: new SigningCredentials(
+                    new SymmetricSecurityKey(
+                       Encoding.UTF8.GetBytes(_configuration["JWT_KEY"])
+                        ),
+                    SecurityAlgorithms.HmacSha256)
+                );
+            return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+        }
+
+        // Generate and set the JWT token in an HTTP-only cookie
+        public string GenerateAndSetHttpOnlyCookie(User user, HttpResponse response)
+        {
+            var token = GenerateJWTToken(user);
+
+            response.Cookies.Append("token", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                Expires = DateTime.UtcNow.AddMinutes(30)
+            });
+            return token;
         }
     }
 }

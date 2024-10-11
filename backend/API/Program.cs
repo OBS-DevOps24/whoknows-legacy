@@ -3,10 +3,17 @@ using API.Interfaces;
 using API.Repositories;
 using API.Services;
 using dotenv.net;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load configuration from .env file
+DotEnv.Load();
+builder.Configuration.AddEnvironmentVariables();
 
 // CORS SETTINGS => Allow any origin, header, and method
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -41,20 +48,50 @@ builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 builder.Services.AddHttpClient();
 
 // Authentication configuration
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+var jwtSecret = Environment.GetEnvironmentVariable("JWT_KEY")
+    ?? throw new InvalidOperationException("JWT_KEY not found.");
+builder.Services.AddAuthentication(cfg => {
+    cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    cfg.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x => {
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = false;
+    x.TokenValidationParameters = new TokenValidationParameters
     {
-        // Cookie settings
-        options.Cookie.HttpOnly = true;
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.LoginPath = "/api/login";
-        options.LogoutPath = "/api/logout";
-        // Keep extending the cookie as long as the user is active
-        options.SlidingExpiration = true;
-    });
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8
+            .GetBytes(jwtSecret)
+        ),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ClockSkew = TimeSpan.Zero
+    };
+    x.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            context.Token = context.Request.Cookies["token"];
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = async context =>
+        {
+            var redisService = context.HttpContext.RequestServices.GetRequiredService<IRedisService>();
+            var token = context.SecurityToken as JwtSecurityToken;
+            if (token != null && await redisService.IsBlacklistedAsync(token.RawData))
+            {
+                context.Fail("Token is invalid.");
+            }
+        }
+    };
+});
 
-// Load configuration from .env file
-DotEnv.Load();
+// Redis configuration
+var redisConnectionString = Environment.GetEnvironmentVariable("Redis")
+    ?? throw new InvalidOperationException("Redis connection string not found.");
+builder.Services.AddSingleton<IRedisService, RedisService>();
+builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnectionString; });
 
 string server = Environment.GetEnvironmentVariable("Server")
     ?? throw new InvalidOperationException("Server not found.");

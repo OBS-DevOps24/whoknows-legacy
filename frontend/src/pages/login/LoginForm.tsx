@@ -13,7 +13,7 @@ const LoginForm = () => {
     e.preventDefault();
     setError("");
     try {
-      await login(username, password);
+      await login({ username, password });
       navigate("/");
     } catch (error) {
 

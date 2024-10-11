@@ -1,0 +1,78 @@
+services:
+  db:
+    image: devobs/dbimage:latest
+    container_name: db-container
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - ${MYSQL_PORT}:${MYSQL_PORT_CONTAINER}
+    volumes:
+      - DATA:/var/lib/mysql
+    profiles: ["prod-db"]
+
+  backend:
+    image: devobs/backendimage:latest
+    container_name: backend-container
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - ${BACKEND_PORT}
+    environment:
+      - Server=${MYSQL_SERVER}
+      - Port=${MYSQL_PORT}
+      - Database=${MYSQL_DATABASE}
+      - User=${MYSQL_USER}
+      - Pwd=${MYSQL_PASSWORD}
+      - Redis=${REDIS_CONNECTION_STRING}
+      - JWT_KEY=${JWT_KEY}
+    networks:
+      - webnet
+    profiles: ["prod-app"]
+    depends_on:
+      - redis
+
+  frontend:
+    image: devobs/frontendimage:latest
+    container_name: frontend-container
+    restart: unless-stopped
+    networks:
+      - webnet
+    ports:
+      - ${FRONTEND_PORT} # Expose port to other services in the same network
+    profiles: ["prod-app"]
+
+  nginx:
+    image: devobs/proxyimage:latest
+    container_name: nginx-container
+    restart: unless-stopped
+    ports:
+      - ${PROXY_PORT}:${PROXY_PORT}
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - webnet
+    profiles: ["prod-app"]
+
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    restart: unless-stopped
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    networks:
+      - webnet
+    profiles: ["prod-app"]
+
+
+networks:
+  webnet:
+    driver: bridge
+
+volumes:
+  DATA:

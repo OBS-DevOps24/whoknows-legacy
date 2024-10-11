@@ -2,7 +2,7 @@
 {
     public interface IRedisService
     {
-        Task AddToBlacklistAsync(string token, TimeSpan ttl);
-        Task<bool> IsBlacklistedAsync(string token);
+        Task AddToBlacklistAsync(string jti, TimeSpan ttl);
+        Task<bool> IsBlacklistedAsync(string jti);
     }
 }

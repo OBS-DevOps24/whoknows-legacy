@@ -49,8 +49,8 @@ builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 builder.Services.AddHttpClient();
 
 // Authentication configuration
-var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
-    ?? throw new InvalidOperationException("JWT_SECRET not found.");
+var jwtSecret = Environment.GetEnvironmentVariable("JWT_KEY")
+    ?? throw new InvalidOperationException("JWT_KEY not found.");
 builder.Services.AddAuthentication(cfg => {
     cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

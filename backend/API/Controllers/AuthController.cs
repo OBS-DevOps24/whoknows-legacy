@@ -11,15 +11,35 @@ namespace API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-
-        public AuthController(IAuthService authService)
+        private readonly ILoggerFactory _loggerFactory;
+        public AuthController(IAuthService authService, ILoggerFactory loggerFactory)
         {
             _authService = authService;
+            _loggerFactory = loggerFactory;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
+            var logger = _loggerFactory.CreateLogger<AuthController>();
+
+            // Log request details
+            logger.LogInformation("Register attempt - Content-Type: {contentType}, Content-Length: {contentLength}",
+                Request.ContentType ?? "no content type",
+                Request.ContentLength ?? 0
+            );
+
+            // Log the request body
+            try {
+                Request.EnableBuffering();  // Add this
+                var body = await new StreamReader(Request.Body).ReadToEndAsync();
+                logger.LogInformation("Request body: {body}", body);
+                Request.Body.Position = 0;  // Add this
+            }
+            catch (Exception ex) {
+                logger.LogError(ex, "Error reading request body");
+            }
+            
             (bool success, string message) = await _authService.RegisterAsync(registerDTO, Response);
             if (success)
             {

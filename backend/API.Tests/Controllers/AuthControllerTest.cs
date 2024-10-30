@@ -17,7 +17,7 @@ namespace API.Tests.Controllers
         public AuthControllerTests()
         {
             _mockAuthService = new Mock<IAuthService>();
-            _controller = new AuthController( _mockAuthService.Object);
+            _controller = new AuthController(_mockAuthService.Object);
             _mockResponse = new Mock<HttpResponse>();
         }
 

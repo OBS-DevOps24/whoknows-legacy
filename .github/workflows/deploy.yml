@@ -66,9 +66,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Copy docker-compose.yml to server
-        run: |
-          scp -i ${{ secrets.SSH_KEY }} docker-compose.yml ${{ secrets.VM_USER }}@${{ secrets.VM_IP_2 }}:/app/.env
-        shell: bash
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_IP_1 }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.PASSWORD }}
+          source: "docker-compose.yml"
+          target: "~/app"
 
       - name: Copy .env to server
         env:
@@ -127,9 +131,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Copy docker-compose.yml to server
-        run: |
-          scp -i ${{ secrets.SSH_KEY }} docker-compose.yml ${{ secrets.VM_USER }}@${{ secrets.VM_IP_1 }}:/app/.env
-        shell: bash
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_IP_1 }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.PASSWORD }}
+          source: "docker-compose.yml"
+          target: "~/app"
 
       - name: Copy .env to server
         env:

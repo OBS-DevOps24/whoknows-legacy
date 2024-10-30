@@ -29,22 +29,26 @@ async function getWeatherResults(
   return fetch(`${WEATHER_URL}`, { credentials: 'include' }).then(handleHttpErrors);
 }
 
-async function registerUser(
-  username: string,
-  email: string,
-  password: string,
-  password2: string
-): Promise<RegisterFormData> {
-  return fetch(`${API_URL}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, email, password, password2 }),
-    credentials: 'include',
-  }).then(handleHttpErrors);
-}
+const registerUser = async (registerData: RegisterFormData): Promise<void> => {
+  try {
+    await axios.post(`${API_URL}/register`, registerData, { withCredentials: true });
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
 
 const loginUser = async (loginData: LoginFormData): Promise<void> => {
-  await axios.post(`${API_URL}/login`, loginData, { withCredentials: true });
+  try {
+    await axios.post(`${API_URL}/login`, loginData, { withCredentials: true });
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('An unexpected error occurred');
+  }
 };
 
 const logoutUser = async (): Promise<void> => {

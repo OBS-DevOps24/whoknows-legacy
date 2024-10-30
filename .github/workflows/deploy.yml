@@ -134,4 +134,4 @@ jobs:
         run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
       - name: Run API tests
         run: |
-          postman collection run "12623662-e0ffcb23-d02d-4b2f-89dd-a828110f538a" --env-var "baseUrl=${{ secrets.VM_IP_1 }}"
+          postman collection run "12623662-e0ffcb23-d02d-4b2f-89dd-a828110f538a" --env-var "baseUrl=${{ secrets.BASEURL}}"

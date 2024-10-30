@@ -26,7 +26,7 @@ namespace API.Services
         }
 
         // Registration logic
-        public async Task<(bool Success, string Message)> RegisterAsync(RegisterDTO registerDTO)
+        public async Task<(bool Success, string Message)> RegisterAsync(RegisterDTO registerDTO, HttpResponse response)
         {
             if (await _userRepository.GetUserByUsernameAsync(registerDTO.Username) != null)
             {
@@ -51,7 +51,13 @@ namespace API.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return (true, "You were successfully registered and can login now");
+            // Auto login after registration
+            var loginDTO = new LoginDTO { Username = registerDTO.Username, Password = registerDTO.Password };
+            (bool loginSuccess, string loginMessage) = await LoginAsync(loginDTO, response);
+
+            return (loginSuccess 
+                ? (true, "You were successfully registered and logged in")
+                : (false, "You were successfully registered but could not be logged in"));
         }
 
         // Login logic

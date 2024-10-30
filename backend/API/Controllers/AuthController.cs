@@ -20,7 +20,7 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
-            (bool success, string message) = await _authService.RegisterAsync(registerDTO);
+            (bool success, string message) = await _authService.RegisterAsync(registerDTO, Response);
             if (success)
             {
                 return Ok(new { message });

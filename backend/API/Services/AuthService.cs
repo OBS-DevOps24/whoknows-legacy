@@ -3,6 +3,7 @@ using API.Interfaces;
 using API.Models;
 using API.Models.Dtos;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -134,6 +135,8 @@ namespace API.Services
         }
 
         // JWT token generation
+        [SuppressMessage("Security", "S6781:JWT secret keys should not be disclosed.",
+            Justification = "JWT key is stored in the .env file and not hardcoded in the code, the env name is just JWT_KEY, so this is a false positive.")]
         public string GenerateJWTToken(User user)
         {
             var jti = Guid.NewGuid().ToString();

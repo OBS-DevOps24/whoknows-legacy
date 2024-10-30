@@ -52,11 +52,15 @@ services:
     restart: unless-stopped
     ports:
       - ${PROXY_PORT}:${PROXY_PORT}
+      - "443:443"
     depends_on:
       - frontend
       - backend
     networks:
       - webnet
+    volumes:
+      - /etc/letsencrypt/live/devobs.dk:/etc/letsencrypt/live/devobs.dk
+      - /etc/letsencrypt/archive/devobs.dk:/etc/letsencrypt/archive/devobs.dk
     profiles: ["prod-app"]
 
   redis:
@@ -68,7 +72,6 @@ services:
     networks:
       - webnet
     profiles: ["prod-app"]
-
 
 networks:
   webnet:

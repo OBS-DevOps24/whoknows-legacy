@@ -121,6 +121,40 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(MyAllowSpecificOrigins);
 
+// Logging middleware to catch 415 errors
+app.Use(async (context, next) =>
+{
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+    // Log request details
+    logger.LogInformation(
+        "Request: {Method} {Path} - Content-Type: {ContentType}, Content-Length: {ContentLength}",
+        context.Request.Method,
+        context.Request.Path,
+        context.Request.ContentType ?? "no content type",
+        context.Request.ContentLength ?? 0
+    );
+
+    // Only log body for specific endpoints and methods
+    if (context.Request.Path.StartsWithSegments("/api/register") || 
+        context.Request.Path.StartsWithSegments("/api/login"))
+    {
+        try
+        {
+            context.Request.EnableBuffering();
+            var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+            logger.LogInformation("Request body: {body}", body);
+            context.Request.Body.Position = 0;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error reading request body");
+        }
+    }
+
+    await next();
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

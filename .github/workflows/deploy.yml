@@ -71,7 +71,7 @@ jobs:
           host: ${{ secrets.VM_IP_2 }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: ./app/docker-compose.yml
+          source: ./docker-compose.yml
           target: /app/docker-compose.yml
 
       - name: Copy .env to server
@@ -136,7 +136,7 @@ jobs:
           host: ${{ secrets.VM_IP_1 }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: ./app/docker-compose.yml
+          source: ./docker-compose.yml
           target: /app/docker-compose.yml
 
       - name: Copy .env to server

@@ -74,39 +74,6 @@ jobs:
           source: "docker-compose.yml"
           target: "~/app"
 
-      - name: Copy .env to server
-        env:
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-          MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
-          MYSQL_PORT_CONTAINER: ${{ secrets.MYSQL_PORT_CONTAINER }}
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          MYSQL_SERVER: ${{ secrets.MYSQL_SERVER }}
-          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
-          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
-          PROXY_PORT: ${{ secrets.PROXY_PORT }}
-          REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          REDIS_CONNECTION_STRING: ${{ secrets.REDIS_CONNECTION_STRING }}
-          JWT_KEY: ${{ secrets.JWT_KEY }}
-        run: |
-          # Create .env content
-          echo "MYSQL_DATABASE=${MYSQL_DATABASE}" > .env
-          echo "MYSQL_PORT=${MYSQL_PORT}" >> .env
-          echo "MYSQL_PORT_CONTAINER=${MYSQL_PORT_CONTAINER}" >> .env
-          echo "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}" >> .env
-          echo "MYSQL_USER=${MYSQL_USER}" >> .env
-          echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}" >> .env
-          echo "MYSQL_SERVER=${MYSQL_SERVER}" >> .env
-          echo "BACKEND_PORT=${BACKEND_PORT}" >> .env
-          echo "FRONTEND_PORT=${FRONTEND_PORT}" >> .env
-          echo "PROXY_PORT=${PROXY_PORT}" >> .env
-          echo "REDIS_PORT=${REDIS_PORT}" >> .env
-          echo "REDIS_CONNECTION_STRING=${REDIS_CONNECTION_STRING}" >> .env
-          echo "JWT_KEY=${JWT_KEY}" >> .env
-          scp -i ${{ secrets.SSH_KEY }} .env ${{ secrets.VM_USER }}@${{ secrets.VM_IP_2 }}:/app/.env
-        shell: bash
-
       - name: SSH to server2 and deploy app
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -138,39 +105,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "docker-compose.yml"
           target: "~/app"
-
-      - name: Copy .env to server
-        env:
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-          MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
-          MYSQL_PORT_CONTAINER: ${{ secrets.MYSQL_PORT_CONTAINER }}
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          MYSQL_SERVER: ${{ secrets.MYSQL_SERVER }}
-          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
-          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
-          PROXY_PORT: ${{ secrets.PROXY_PORT }}
-          REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          REDIS_CONNECTION_STRING: ${{ secrets.REDIS_CONNECTION_STRING }}
-          JWT_KEY: ${{ secrets.JWT_KEY }}
-        run: |
-          # Create .env content
-          echo "MYSQL_DATABASE=${MYSQL_DATABASE}" > .env
-          echo "MYSQL_PORT=${MYSQL_PORT}" >> .env
-          echo "MYSQL_PORT_CONTAINER=${MYSQL_PORT_CONTAINER}" >> .env
-          echo "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}" >> .env
-          echo "MYSQL_USER=${MYSQL_USER}" >> .env
-          echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}" >> .env
-          echo "MYSQL_SERVER=${MYSQL_SERVER}" >> .env
-          echo "BACKEND_PORT=${BACKEND_PORT}" >> .env
-          echo "FRONTEND_PORT=${FRONTEND_PORT}" >> .env
-          echo "PROXY_PORT=${PROXY_PORT}" >> .env
-          echo "REDIS_PORT=${REDIS_PORT}" >> .env
-          echo "REDIS_CONNECTION_STRING=${REDIS_CONNECTION_STRING}" >> .env
-          echo "JWT_KEY=${JWT_KEY}" >> .env
-          scp -i ${{ secrets.SSH_KEY }} .env ${{ secrets.VM_USER }}@${{ secrets.VM_IP_1 }}:/app/.env
-        shell: bash
 
       - name: SSH to server1 and deploy app
         uses: appleboy/ssh-action@v1.0.3

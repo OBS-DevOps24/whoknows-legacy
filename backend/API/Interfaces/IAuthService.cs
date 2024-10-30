@@ -9,4 +9,5 @@ namespace API.Interfaces
         Task<(bool Success, string Message)> LoginAsync(LoginDTO loginDTO, HttpResponse response);
         Task<(bool Success, string Message)> LogoutAsync(string token, HttpResponse response);
     }
+    
 }

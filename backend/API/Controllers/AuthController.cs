@@ -66,6 +66,7 @@ namespace API.Controllers
         }
 
         [HttpGet("is-logged-in")]
+        [ProducesResponseType<object>(StatusCodes.Status200OK)]
         public IActionResult IsLoggedIn()
         {
             var token = Request.Cookies["token"];

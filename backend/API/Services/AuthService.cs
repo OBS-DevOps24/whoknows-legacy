@@ -56,7 +56,7 @@ namespace API.Services
             var loginDTO = new LoginDTO { Username = registerDTO.Username, Password = registerDTO.Password };
             (bool loginSuccess, string loginMessage) = await LoginAsync(loginDTO, response);
 
-            return (loginSuccess 
+            return (loginSuccess
                 ? (true, "You were successfully registered and logged in")
                 : (false, "You were successfully registered but could not be logged in"));
         }

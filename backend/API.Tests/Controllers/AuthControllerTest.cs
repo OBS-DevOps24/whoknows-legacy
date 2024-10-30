@@ -1,6 +1,7 @@
 ﻿using API.Controllers;
 using API.Interfaces;
 using API.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -12,11 +13,12 @@ namespace API.Tests.Controllers
     {
         private readonly Mock<IAuthService> _mockAuthService;
         private readonly AuthController _controller;
-
+        private readonly Mock<HttpResponse> _mockResponse;
         public AuthControllerTests()
         {
             _mockAuthService = new Mock<IAuthService>();
-            _controller = new AuthController( _mockAuthService.Object);
+            _controller = new AuthController(_mockAuthService.Object);
+            _mockResponse = new Mock<HttpResponse>();
         }
 
         [Fact]
@@ -30,7 +32,7 @@ namespace API.Tests.Controllers
                 Password = "password123",
                 Password2 = "password123"
             };
-            _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
+            _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>(), It.IsAny<HttpResponse>()))
                 .ReturnsAsync((true, "You were successfully registered and can login now"));
 
             // Act
@@ -52,7 +54,7 @@ namespace API.Tests.Controllers
                 Email = "test@example.com",
                 Password = "password123",
             };
-            _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
+            _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>(), It.IsAny<HttpResponse>()))
                 .ReturnsAsync((true, "You were successfully registered and can login now"));
 
             // Act
@@ -75,7 +77,7 @@ namespace API.Tests.Controllers
                 Password = "password123",
                 Password2 = "password123"
             };
-            _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
+            _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>(), It.IsAny<HttpResponse>()))
                 .ReturnsAsync((false, "The username is already taken"));
 
             // Act
@@ -98,7 +100,7 @@ namespace API.Tests.Controllers
                 Password = "password123",
                 Password2 = "password456"
             };
-            _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>()))
+            _mockAuthService.Setup(x => x.RegisterAsync(It.IsAny<RegisterDTO>(), It.IsAny<HttpResponse>()))
                 .ReturnsAsync((false, "Passwords do not match"));
 
             // Act

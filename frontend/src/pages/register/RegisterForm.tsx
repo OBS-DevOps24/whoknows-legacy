@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { registerUser } from '../../services/apiFacade';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const RegisterForm = () => {
   const [username, setUsername] = useState('');
@@ -9,13 +10,15 @@ const RegisterForm = () => {
   const [password2, setPassword2] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { checkAuthStatus } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     try {
-      await registerUser(username, email, password, password2);
-      navigate('/login');
+      await registerUser({ username, email, password, password2 });
+      await checkAuthStatus();
+      navigate('/');
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

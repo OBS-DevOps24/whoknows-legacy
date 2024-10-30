@@ -3,6 +3,7 @@ using API.Interfaces;
 using API.Models;
 using API.Models.Dtos;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -26,7 +27,7 @@ namespace API.Services
         }
 
         // Registration logic
-        public async Task<(bool Success, string Message)> RegisterAsync(RegisterDTO registerDTO)
+        public async Task<(bool Success, string Message)> RegisterAsync(RegisterDTO registerDTO, HttpResponse response)
         {
             if (await _userRepository.GetUserByUsernameAsync(registerDTO.Username) != null)
             {
@@ -51,7 +52,13 @@ namespace API.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return (true, "You were successfully registered and can login now");
+            // Auto login after registration
+            var loginDTO = new LoginDTO { Username = registerDTO.Username, Password = registerDTO.Password };
+            (bool loginSuccess, string loginMessage) = await LoginAsync(loginDTO, response);
+
+            return (loginSuccess
+                ? (true, "You were successfully registered and logged in")
+                : (false, "You were successfully registered but could not be logged in"));
         }
 
         // Login logic
@@ -128,6 +135,8 @@ namespace API.Services
         }
 
         // JWT token generation
+        [SuppressMessage("Security", "S6781",
+            Justification = "JWT key is stored in the .env file and not hardcoded in the code, the env name is JWT_KEY, so this is a false positive")]
         public string GenerateJWTToken(User user)
         {
             var jti = Guid.NewGuid().ToString();

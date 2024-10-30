@@ -135,8 +135,8 @@ namespace API.Services
         }
 
         // JWT token generation
-        [SuppressMessage("Security", "S6781:JWT secret keys should not be disclosed.",
-            Justification = "JWT key is stored in the .env file and not hardcoded in the code, the env name is just JWT_KEY, so this is a false positive.")]
+        [SuppressMessage("Security", "S6781",
+            Justification = "JWT key is stored in the .env file and not hardcoded in the code, the env name is JWT_KEY, so this is a false positive")]
         public string GenerateJWTToken(User user)
         {
             var jti = Guid.NewGuid().ToString();

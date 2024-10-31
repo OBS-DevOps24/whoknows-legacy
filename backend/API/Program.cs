@@ -121,7 +121,7 @@ app.UseTokenBlacklistMiddleware();
 app.Use(async (context, next) =>
 {
     // Log for auth endpoints
-    if (context.Request.Path.StartsWithSegments("/api/register") || 
+    if (context.Request.Path.StartsWithSegments("/api/register") ||
         context.Request.Path.StartsWithSegments("/api/login"))
     {
         var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();

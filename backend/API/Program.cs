@@ -2,11 +2,11 @@ using API.Data;
 using API.Interfaces;
 using API.Repositories;
 using API.Services;
+using API.Middleware;
 using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,15 +74,6 @@ builder.Services.AddAuthentication(cfg => {
         {
             context.Token = context.Request.Cookies["token"];
             return Task.CompletedTask;
-        },
-        OnTokenValidated = async context =>
-        {
-            var redisService = context.HttpContext.RequestServices.GetRequiredService<IRedisService>();
-            var token = context.SecurityToken as JwtSecurityToken;
-            if (token != null && await redisService.IsBlacklistedAsync(token.RawData))
-            {
-                context.Fail("Token is invalid.");
-            }
         }
     };
 });
@@ -120,6 +111,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(MyAllowSpecificOrigins);
+
+// Token blacklist middleware
+app.UseTokenBlacklistMiddleware();
 
 // Logging middleware to catch 415 errors
 app.Use(async (context, next) =>

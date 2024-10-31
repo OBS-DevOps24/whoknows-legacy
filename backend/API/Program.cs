@@ -2,11 +2,11 @@ using API.Data;
 using API.Interfaces;
 using API.Repositories;
 using API.Services;
+using API.Middleware;
 using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,11 +50,13 @@ builder.Services.AddHttpClient();
 // Authentication configuration
 var jwtSecret = Environment.GetEnvironmentVariable("JWT_KEY")
     ?? throw new InvalidOperationException("JWT_KEY not found.");
-builder.Services.AddAuthentication(cfg => {
+builder.Services.AddAuthentication(cfg =>
+{
     cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     cfg.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x => {
+}).AddJwtBearer(x =>
+{
     x.RequireHttpsMetadata = false;
     x.SaveToken = false;
     x.TokenValidationParameters = new TokenValidationParameters
@@ -74,15 +76,6 @@ builder.Services.AddAuthentication(cfg => {
         {
             context.Token = context.Request.Cookies["token"];
             return Task.CompletedTask;
-        },
-        OnTokenValidated = async context =>
-        {
-            var redisService = context.HttpContext.RequestServices.GetRequiredService<IRedisService>();
-            var token = context.SecurityToken as JwtSecurityToken;
-            if (token != null && await redisService.IsBlacklistedAsync(token.RawData))
-            {
-                context.Fail("Token is invalid.");
-            }
         }
     };
 });
@@ -105,7 +98,7 @@ string password = Environment.GetEnvironmentVariable("Pwd");
 string connectionString = $"server={server};port={port};database={database};user={user};password={password}";
 
 // Configure the database
-builder.Services.AddDbContext<DataContext>(options => 
+builder.Services.AddDbContext<DataContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
         .LogTo(Console.WriteLine, LogLevel.Information)
         .EnableDetailedErrors());
@@ -121,38 +114,35 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(MyAllowSpecificOrigins);
 
+// Token blacklist middleware
+app.UseTokenBlacklistMiddleware();
+
 // Logging middleware to catch 415 errors
 app.Use(async (context, next) =>
 {
-    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-
-    // Log request details
-    logger.LogInformation(
-        "Request: {Method} {Path} - Content-Type: {ContentType}, Content-Length: {ContentLength}",
-        context.Request.Method,
-        context.Request.Path,
-        context.Request.ContentType ?? "no content type",
-        context.Request.ContentLength ?? 0
-    );
-
-    // Only log body for specific endpoints and methods
-    if (context.Request.Path.StartsWithSegments("/api/register") || 
+    // Log for auth endpoints
+    if (context.Request.Path.StartsWithSegments("/api/register") ||
         context.Request.Path.StartsWithSegments("/api/login"))
     {
-        try
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+        await next();
+
+        // Log if it was a 415 error
+        if (context.Response.StatusCode == 415)
         {
-            context.Request.EnableBuffering();
-            var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
-            logger.LogInformation("Request body: {body}", body);
-            context.Request.Body.Position = 0;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error reading request body");
+            logger.LogError(
+                "415 Unsupported Media Type Error - {Method} {Path} - Content-Type: {ContentType}",
+                context.Request.Method,
+                context.Request.Path,
+                context.Request.ContentType ?? "no content type"
+            );
         }
     }
-
-    await next();
+    else
+    {
+        await next();
+    }
 });
 
 app.UseHttpsRedirection();

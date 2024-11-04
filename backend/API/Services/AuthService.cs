@@ -31,7 +31,8 @@ namespace API.Services
         {
             // Custom email validation, to ensure proper feedback to the user
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-            if (!System.Text.RegularExpressions.Regex.IsMatch(registerDTO.Email, emailPattern))
+            var timeout = TimeSpan.FromSeconds(1);
+            if (!System.Text.RegularExpressions.Regex.IsMatch(registerDTO.Email, emailPattern, System.Text.RegularExpressions.RegexOptions.None, timeout))
             {
                 return (false, "Invalid email address");
             }

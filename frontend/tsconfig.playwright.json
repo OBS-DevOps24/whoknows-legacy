@@ -1,8 +1,8 @@
 {
-    "extends": "./tsconfig.node.json",
-    "compilerOptions": {
-      "composite": true,
-      "types": ["node", "@playwright/test"]
-    },
-    "include": ["playwright.config.ts", "end2end/**/*.ts"]
-  }
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "composite": true,
+    "types": ["node", "@playwright/test"]
+  },
+  "include": ["playwright.config.ts", "end2end/**/*.ts"]
+}

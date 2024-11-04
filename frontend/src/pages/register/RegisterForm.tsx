@@ -51,7 +51,7 @@ const RegisterForm = () => {
         <div>
           <label htmlFor="email" className="sr-only">E-Mail</label>
           <input
-            type="email"
+            type="text" // To fix errors when signing up with æ, ø, or å - we use type="text" instead of type="email"
             id="email"
             className={inputClassName}
             placeholder="E-Mail"

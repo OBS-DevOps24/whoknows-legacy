@@ -29,6 +29,12 @@ namespace API.Services
         // Registration logic
         public async Task<(bool Success, string Message)> RegisterAsync(RegisterDTO registerDTO, HttpResponse response)
         {
+            // Custom email validation, to ensure proper feedback to the user
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            if (!System.Text.RegularExpressions.Regex.IsMatch(registerDTO.Email, emailPattern))
+            {
+                return (false, "Invalid email address");
+            }
             if (await _userRepository.GetUserByUsernameAsync(registerDTO.Username) != null)
             {
                 return (false, "The username is already taken");

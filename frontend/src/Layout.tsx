@@ -1,4 +1,5 @@
 import Header from "./Header";
+import Footer from "./Footer";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -11,7 +12,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className="w-full">
         <div className="mt-10 max-w-[1200px] mx-auto">{children}</div>
       </div>
-      <div className="py-4 bg-zinc-200">FOOTER</div>
+      <Footer />
     </main>
   );
 }

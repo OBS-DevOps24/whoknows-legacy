@@ -15,10 +15,10 @@ const Header = () => {
   };
 
   return (
-    <div className="navigation">
+    <div className="navigation mx-5">
       <nav className="flex items-center p-4">
         <div className="flex-1 flex justify-start">
-          {/* This empty div maintains layout balance */}
+          <Link to="/weather" className="text-blue-500 hover:text-blue-700">Weather</Link>
         </div>
         <div className="flex-1 flex justify-center">
           <h1 className="text-2xl font-bold underline">

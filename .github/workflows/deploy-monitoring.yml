@@ -21,8 +21,7 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.MONITORING_VM_SSH_KEY }}
           script: |
-            mkdir -p ~/monitoring/prometheus
-            mkdir -p ~/monitoring/grafana
+            mkdir -p ~/monitoring
         # Copies monitoring files to the VM
       - name: Copy monitoring files
         uses: appleboy/scp-action@v0.1.7
@@ -31,7 +30,7 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.MONITORING_VM_SSH_KEY }}
           source: "monitoring/*"
-          target: "~/"
+          target: "~/monitoring"
           strip_components: 1
         # Deploys the monitoring stack
       - name: Deploy monitoring stack

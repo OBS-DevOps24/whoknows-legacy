@@ -11,7 +11,6 @@ using System.Text;
 using Prometheus;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
-using OpenTelemetry.Instrumentation.Runtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +38,15 @@ builder.Services.AddOpenTelemetry()
         .AddService(serviceName: "whoknows-api"))
     .WithMetrics(metrics => metrics
         .AddAspNetCoreInstrumentation()
-        .AddRuntimeInstrumentation());
+        .AddRuntimeInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddProcessInstrumentation()
+        .AddPrometheusExporter());
+// Configure Prometheus metrics endpoint
+builder.Services.Configure<PrometheusExporterOptions>(options =>
+{
+    options.ScrapeEndpointPath = "/api/metrics";
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -164,6 +171,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Prometheus metrics endpoint
-app.UseMetricServer("/api/metrics");
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 await app.RunAsync();

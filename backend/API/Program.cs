@@ -8,10 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Prometheus;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
-using OpenTelemetry.Instrumentation.Runtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +36,15 @@ builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource
         .AddService(serviceName: "whoknows-api"))
     .WithMetrics(metrics => metrics
+        .AddMeter("Microsoft.AspNetCore.Hosting")
+        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+        .AddMeter("System.Net.Http")
         .AddAspNetCoreInstrumentation()
-        .AddRuntimeInstrumentation());
+        .AddRuntimeInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddProcessInstrumentation()
+        .AddPrometheusExporter());
+
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -164,6 +169,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Prometheus metrics endpoint
-app.UseMetricServer("/api/metrics");
+app.UseOpenTelemetryPrometheusScrapingEndpoint("/api/metrics");
 
 await app.RunAsync();

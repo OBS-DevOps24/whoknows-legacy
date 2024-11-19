@@ -1,0 +1,52 @@
+name: Deploy Monitoring Stack
+
+# Triggers on push to main branch that contains changes to monitoring files OR on manual trigger
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'monitoring/**'
+  workflow_dispatch:  # Manual trigger from GitHub UI
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        # Creates directories on the VM if they don't exist
+      - name: Create monitoring directories
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.MONITORING_VM_IP }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.MONITORING_VM_SSH_KEY }}
+          script: |
+            mkdir -p ~/monitoring/prometheus
+            mkdir -p ~/monitoring/grafana
+        # Copies monitoring files to the VM
+      - name: Copy monitoring files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.MONITORING_VM_IP }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.MONITORING_VM_SSH_KEY }}
+          source: "monitoring/*"
+          target: "~/"
+          strip_components: 1
+        # Deploys the monitoring stack
+      - name: Deploy monitoring stack
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.MONITORING_VM_IP }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.MONITORING_VM_SSH_KEY }}
+          envs: |
+            GRAFANA_ADMIN_USER,
+            GRAFANA_ADMIN_PASSWORD
+          script: |
+            cd ~/monitoring
+            echo "GRAFANA_ADMIN_USER=${{ secrets.GRAFANA_ADMIN_USER }}" > .env
+            echo "GRAFANA_ADMIN_PASSWORD=${{ secrets.GRAFANA_ADMIN_PASSWORD }}" >> .env
+            docker compose pull
+            docker compose up -d --remove-orphans
+            docker system prune -f

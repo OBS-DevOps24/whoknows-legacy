@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'whoknows-monitor'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'whoknows-api'
+    metrics_path: '/api/metrics'
+    scheme: https  # Using HTTPS since it's production
+    static_configs:
+      - targets: ['devobs.dk']
+
+#  - job_name: 'production_vm'
+#    static_configs:
+#      - targets: ['IP:9100']

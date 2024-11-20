@@ -4,8 +4,9 @@ import {
   logoutUser,
   checkAuthStatusApi,
   checkPasswordStatusApi,
+  changePasswordApi,
 } from "../services/apiFacade";
-import { LoginFormData } from "../interfaces/types";
+import { ChangePasswordFormData, LoginFormData } from "../interfaces/types";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -13,6 +14,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
   isPasswordExpired: boolean;
+  changePassword: (changePasswordData: ChangePasswordFormData) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,8 +37,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     checkAuthStatus();
-    checkIsPasswordExpired();
   }, []);
+
+  useEffect(() => {
+    checkIsPasswordExpired();
+    console.log("Checking password status");
+  }, [isLoggedIn]);
 
   const login = async (loginData: LoginFormData) => {
     try {
@@ -69,9 +75,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const changePassword = async (changePasswordData: ChangePasswordFormData) => {
+    try {
+      await changePasswordApi(changePasswordData);
+      const status = await checkPasswordStatusApi();
+      setIsPasswordExpired(status);
+    } catch (error) {
+      console.error("Login failed:", error);
+      setIsPasswordExpired(false);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, login, logout, checkAuthStatus, isPasswordExpired }}
+      value={{
+        isLoggedIn,
+        login,
+        logout,
+        checkAuthStatus,
+        isPasswordExpired,
+        changePassword,
+      }}
     >
       {children}
     </AuthContext.Provider>

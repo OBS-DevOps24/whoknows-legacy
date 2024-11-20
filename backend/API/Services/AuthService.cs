@@ -129,6 +129,64 @@ namespace API.Services
             return user;
         }
 
+        // Change Password logic
+        public async Task<(bool Success, string Message)> ChangePasswordAsync(int userId, ChangePasswordDTO changePasswordDTO, HttpResponse response)
+        {
+            try
+            {
+                // Find the user
+                var user = await _userRepository.GetUserByIdAsync(userId);
+                if (user == null)
+                {
+                    return (false, "User not found");
+                }
+                // Check if the old password is correct
+                if (!VerifyPassword(changePasswordDTO.OldPassword, user.Password))
+                {
+                    return (false, "Current password is incorrect");
+                }
+                // Check if the new password is the same as the old password
+                if (VerifyPassword(changePasswordDTO.NewPassword, user.Password))
+                {
+                    return (false, "New password cannot be the same as the old password");
+                }
+                // Change the password and set expired flag to false
+                user.Password = HashPassword(changePasswordDTO.NewPassword);
+                user.ExpiredPassword = false;
+                await _context.SaveChangesAsync();
+
+                return (true, "Password changed successfully");
+            }
+            catch (Exception)
+            {
+                return (false, "An error occurred while changing the password");
+            }
+        }
+
+        // Check if the user is logged in and if the password has expired
+        public async Task<(bool IsLoggedIn, bool ExpiredPassword)> CheckLoginStatusAsync(string token)
+        {
+            // Check if the token is empty
+            if (string.IsNullOrEmpty(token))
+            {
+                return (false, false);
+            }
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+                var userId = int.Parse(jsonToken.Claims.First(claim => claim.Type == "sub").Value);
+                var user = await _userRepository.GetUserByIdAsync(userId);
+                // Returns if the user is logged in and if the password has expired
+                return (true, user?.ExpiredPassword ?? false);
+            }
+            catch
+            {
+                return (false, false);
+            }
+        }
+
         // Password hashing
         private string HashPassword(string password)
         {

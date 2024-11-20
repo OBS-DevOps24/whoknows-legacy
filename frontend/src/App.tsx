@@ -10,6 +10,7 @@ import Weather from "./pages/weather/Weather";
 import ChangePassword from "./pages/changePassword/ChangePassword";
 import RequireAuth from "./pages/changePassword/RequireAuth";
 import SecurityBreachBanner from "./pages/changePassword/SecurityBreachBanner";
+import RequirePasswordChange from "./pages/changePassword/RequirePasswordChange";
 
 function App() {
   return (
@@ -17,10 +18,38 @@ function App() {
       <SecurityBreachBanner />
       <Layout>
         <Routes>
-          <Route path="/" element={<SearchPage />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <RequirePasswordChange>
+                <SearchPage />
+              </RequirePasswordChange>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <RequirePasswordChange>
+                <About />
+              </RequirePasswordChange>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <RequirePasswordChange>
+                <Register />
+              </RequirePasswordChange>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <RequirePasswordChange>
+                <Login />
+              </RequirePasswordChange>
+            }
+          />
           <Route
             path="/change-password"
             element={
@@ -29,7 +58,14 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/weather" element={<Weather />} />
+          <Route
+            path="/weather"
+            element={
+              <RequirePasswordChange>
+                <Weather />
+              </RequirePasswordChange>
+            }
+          />
         </Routes>
       </Layout>
     </AuthProvider>

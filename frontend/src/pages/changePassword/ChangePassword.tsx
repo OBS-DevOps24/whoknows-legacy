@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function ChangePassword() {
@@ -7,7 +6,6 @@ export default function ChangePassword() {
   const [newPassword1, setNewPassword1] = useState("");
   const [newPassword2, setNewPassword2] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   const [isChanged, setIsChanged] = useState(false);
 

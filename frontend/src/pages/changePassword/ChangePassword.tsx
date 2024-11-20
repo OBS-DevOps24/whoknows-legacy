@@ -38,8 +38,6 @@ export default function ChangePassword() {
     }
   };
 
-  console.log("ChangePassword.tsx");
-
   const inputClassName =
     "peer block w-full rounded-md border border-gray-200 py-[9px] pl-3 text-sm outline-2 placeholder:text-gray-500";
 
@@ -66,45 +64,48 @@ export default function ChangePassword() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="password" className="sr-only">
+            <label htmlFor="oldPassword" className="sr-only">
               Password
             </label>
             <input
               type="password"
-              id="password"
+              id="oldPassword"
               className={inputClassName}
               placeholder="Old password"
               value={oldPassword}
               onChange={e => setOldPassword(e.target.value)}
               required
+              autoComplete="current-password"
             />
           </div>
           <div>
-            <label htmlFor="password" className="sr-only">
+            <label htmlFor="newPassword1" className="sr-only">
               Password
             </label>
             <input
               type="password"
-              id="password"
+              id="newPassword1"
               className={inputClassName}
               placeholder="New password"
               value={newPassword1}
               onChange={e => setNewPassword1(e.target.value)}
               required
+              autoComplete="new-password"
             />
           </div>
           <div>
-            <label htmlFor="password" className="sr-only">
+            <label htmlFor="newPassword2" className="sr-only">
               Password
             </label>
             <input
               type="password"
-              id="password"
+              id="newPassword2"
               className={inputClassName}
               placeholder="New password confirm"
               value={newPassword2}
               onChange={e => setNewPassword2(e.target.value)}
               required
+              autoComplete="new-password"
             />
           </div>
           <div>

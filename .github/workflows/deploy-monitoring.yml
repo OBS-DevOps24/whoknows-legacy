@@ -47,6 +47,7 @@ jobs:
             cd ~/monitoring
             echo "GRAFANA_ADMIN_USER=${{ secrets.GRAFANA_ADMIN_USER }}" > .env
             echo "GRAFANA_ADMIN_PASSWORD=${{ secrets.GRAFANA_ADMIN_PASSWORD }}" >> .env
+            echo "VM_IP_1=${{ secrets.VM_IP_1 }}" >> .env
             docker compose pull
             docker compose up -d --remove-orphans
             docker system prune -f

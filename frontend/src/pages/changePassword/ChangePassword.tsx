@@ -38,6 +38,8 @@ export default function ChangePassword() {
     }
   };
 
+  console.log("ChangePassword.tsx");
+
   const inputClassName =
     "peer block w-full rounded-md border border-gray-200 py-[9px] pl-3 text-sm outline-2 placeholder:text-gray-500";
 

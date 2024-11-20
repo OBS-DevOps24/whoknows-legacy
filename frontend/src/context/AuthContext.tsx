@@ -41,7 +41,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     checkIsPasswordExpired();
-    console.log("Checking password status");
   }, [isLoggedIn]);
 
   const login = async (loginData: LoginFormData) => {

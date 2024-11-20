@@ -41,7 +41,8 @@ jobs:
           key: ${{ secrets.MONITORING_VM_SSH_KEY }}
           envs: |
             GRAFANA_ADMIN_USER,
-            GRAFANA_ADMIN_PASSWORD
+            GRAFANA_ADMIN_PASSWORD,
+            VM_IP_1
           script: |
             cd ~/monitoring
             echo "GRAFANA_ADMIN_USER=${{ secrets.GRAFANA_ADMIN_USER }}" > .env

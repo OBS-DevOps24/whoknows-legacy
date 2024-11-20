@@ -36,3 +36,8 @@ export type ChangePasswordFormData = {
   oldPassword: string;
   newPassword: string;
 };
+
+export type CheckAuthStatusResponse = {
+  isLoggedIn: boolean;
+  expiredPassword: boolean;
+};

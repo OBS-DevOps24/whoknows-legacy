@@ -3,7 +3,6 @@ import {
   loginUser,
   logoutUser,
   checkAuthStatusApi,
-  checkPasswordStatusApi,
   changePasswordApi,
 } from "../services/apiFacade";
 import { ChangePasswordFormData, LoginFormData } from "../interfaces/types";
@@ -28,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const checkAuthStatus = async () => {
     try {
       const status = await checkAuthStatusApi();
-      setIsLoggedIn(status);
+      setIsLoggedIn(status.isLoggedIn);
     } catch (error) {
       console.error("Error checking auth status:", error);
       setIsLoggedIn(false);
@@ -66,8 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const checkIsPasswordExpired = async () => {
     try {
-      const status = await checkPasswordStatusApi();
-      setIsPasswordExpired(status);
+      const status = await checkAuthStatusApi();
+      setIsPasswordExpired(status.expiredPassword);
     } catch (error) {
       console.error("Error checking password status:", error);
       setIsPasswordExpired(false);
@@ -77,8 +76,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const changePassword = async (changePasswordData: ChangePasswordFormData) => {
     try {
       await changePasswordApi(changePasswordData);
-      const status = await checkPasswordStatusApi();
-      setIsPasswordExpired(status);
+      const status = await checkAuthStatusApi();
+      setIsPasswordExpired(status.expiredPassword);
     } catch (error) {
       console.error("Login failed:", error);
       setIsPasswordExpired(false);

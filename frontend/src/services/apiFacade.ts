@@ -4,6 +4,7 @@ import {
   RegisterFormData,
   LoginFormData,
   ChangePasswordFormData,
+  CheckAuthStatusResponse,
 } from "../interfaces/types";
 import { API_URL } from "../../Settings";
 import { handleHttpErrors } from "./fetchUtils";
@@ -63,25 +64,17 @@ const logoutUser = async (): Promise<void> => {
   await axios.get(`${API_URL}/logout`, { withCredentials: true });
 };
 
-const checkAuthStatusApi = async (): Promise<boolean> => {
+const checkAuthStatusApi = async (): Promise<CheckAuthStatusResponse> => {
   try {
     const response = await axios.get(`${API_URL}/is-logged-in`, {
       withCredentials: true,
     });
-    return response.data.isLoggedIn;
+    return response.data;
   } catch {
-    return false;
-  }
-};
-
-const checkPasswordStatusApi = async (): Promise<boolean> => {
-  try {
-    const response = await axios.get(`${API_URL}/is-logged-in`, {
-      withCredentials: true,
-    });
-    return response.data.expiredPassword;
-  } catch {
-    return false;
+    return {
+      isLoggedIn: false,
+      expiredPassword: false,
+    };
   }
 };
 
@@ -107,6 +100,5 @@ export {
   loginUser,
   logoutUser,
   checkAuthStatusApi,
-  checkPasswordStatusApi,
   changePasswordApi,
 };

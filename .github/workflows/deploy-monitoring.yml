@@ -48,6 +48,8 @@ jobs:
             echo "GRAFANA_ADMIN_USER=${{ secrets.GRAFANA_ADMIN_USER }}" > .env
             echo "GRAFANA_ADMIN_PASSWORD=${{ secrets.GRAFANA_ADMIN_PASSWORD }}" >> .env
             echo "VM_IP_1=${{ secrets.VM_IP_1 }}" >> .env
+            export VM_IP_1=${{ secrets.VM_IP_1 }}
+            envsubst < prometheus/prometheus.yml.template > prometheus/prometheus.yml
             docker compose pull
             docker compose up -d --remove-orphans
             docker system prune -f

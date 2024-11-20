@@ -32,6 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await loginUser(loginData);
       setIsLoggedIn(true);
+      await checkAuthStatus();
     } catch (error) {
       console.error('Login failed:', error);
       setIsLoggedIn(false);

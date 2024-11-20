@@ -70,7 +70,7 @@ namespace API.Controllers
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                 ?? throw new InvalidOperationException("User ID not found in token"));
 
             var (success, message) = await _authService.ChangePasswordAsync(userId, changePasswordDTO, Response);

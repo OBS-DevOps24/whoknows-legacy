@@ -31,3 +31,13 @@ export type LoginFormData = {
   username: string;
   password: string;
 };
+
+export type ChangePasswordFormData = {
+  oldPassword: string;
+  newPassword: string;
+};
+
+export type CheckAuthStatusResponse = {
+  isLoggedIn: boolean;
+  expiredPassword: boolean;
+};

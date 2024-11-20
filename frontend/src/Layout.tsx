@@ -12,7 +12,9 @@ export default function Layout({ children }: LayoutProps) {
       <div className="w-full">
         <div className="mt-10 max-w-[1200px] mx-auto">{children}</div>
       </div>
-      <Footer />
+      <div>
+        <Footer />
+      </div>
     </main>
   );
 }

@@ -1,25 +1,35 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { loginUser, logoutUser, checkAuthStatusApi } from '../services/apiFacade';
-import { LoginFormData } from '../interfaces/types';
+import React, { createContext, useState, useContext, useEffect } from "react";
+import {
+  loginUser,
+  logoutUser,
+  checkAuthStatusApi,
+  changePasswordApi,
+} from "../services/apiFacade";
+import { ChangePasswordFormData, LoginFormData } from "../interfaces/types";
 
 interface AuthContextType {
   isLoggedIn: boolean;
   login: (loginData: LoginFormData) => Promise<void>;
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
+  isPasswordExpired: boolean;
+  changePassword: (changePasswordData: ChangePasswordFormData) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isPasswordExpired, setIsPasswordExpired] = useState(false);
 
   const checkAuthStatus = async () => {
     try {
       const status = await checkAuthStatusApi();
-      setIsLoggedIn(status);
+      setIsLoggedIn(status.isLoggedIn);
     } catch (error) {
-      console.error('Error checking auth status:', error);
+      console.error("Error checking auth status:", error);
       setIsLoggedIn(false);
     }
   };
@@ -28,13 +38,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuthStatus();
   }, []);
 
+  useEffect(() => {
+    checkIsPasswordExpired();
+  }, [isLoggedIn]);
+
   const login = async (loginData: LoginFormData) => {
     try {
       await loginUser(loginData);
       setIsLoggedIn(true);
       await checkAuthStatus();
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       setIsLoggedIn(false);
       throw error;
     }
@@ -45,12 +59,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await logoutUser();
       setIsLoggedIn(false);
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
+    }
+  };
+
+  const checkIsPasswordExpired = async () => {
+    try {
+      const status = await checkAuthStatusApi();
+      setIsPasswordExpired(status.expiredPassword);
+    } catch (error) {
+      console.error("Error checking password status:", error);
+      setIsPasswordExpired(false);
+    }
+  };
+
+  const changePassword = async (changePasswordData: ChangePasswordFormData) => {
+    try {
+      await changePasswordApi(changePasswordData);
+      const status = await checkAuthStatusApi();
+      setIsPasswordExpired(status.expiredPassword);
+    } catch (error) {
+      console.error("Login failed:", error);
+      setIsPasswordExpired(false);
+      throw error;
     }
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, checkAuthStatus }}>
+    <AuthContext.Provider
+      value={{
+        isLoggedIn,
+        login,
+        logout,
+        checkAuthStatus,
+        isPasswordExpired,
+        changePassword,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -59,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

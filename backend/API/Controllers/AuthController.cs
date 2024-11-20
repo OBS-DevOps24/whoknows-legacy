@@ -3,6 +3,7 @@ using API.Models;
 using API.Models.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -65,12 +66,29 @@ namespace API.Controllers
             }
         }
 
+        [HttpPut("auth")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? throw new InvalidOperationException("User ID not found in token"));
+
+            var (success, message) = await _authService.ChangePasswordAsync(userId, changePasswordDTO, Response);
+
+            if (success)
+            {
+                return Ok(new { message });
+            }
+            return BadRequest(new { message });
+        }
+
         [HttpGet("is-logged-in")]
         [ProducesResponseType<object>(StatusCodes.Status200OK)]
-        public IActionResult IsLoggedIn()
+        public async Task<IActionResult> IsLoggedIn()
         {
             var token = Request.Cookies["token"];
-            return Ok(new { isLoggedIn = !string.IsNullOrEmpty(token) });
+            var (isLoggedIn, expiredPassword) = await _authService.CheckLoginStatusAsync(token);
+            return Ok(new { isLoggedIn, expiredPassword });
         }
     }
 }

@@ -25,5 +25,8 @@ namespace API.Models
         [Column("password")]
         public string Password { get; set; }
 
+        [Column("expired_password")]
+        public bool ExpiredPassword { get; set; } = false;
+
     }
 }

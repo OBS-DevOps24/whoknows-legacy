@@ -30,10 +30,10 @@
   - GitHub badges for easy overview of status for deployments, tests, etc
 
 ### Continual Learning and Experimentation
-- Documentation of process and postmortem(s).
+- Documentation of process and postmortem(s)
 - Focus on psychological safety
   - Emphasis on learning and sharing knowledge
-- Experimentation with new tools and technologies, such as C# / .NET for our backend.
+- Experimentation with new tools and technologies, such as C# / .NET for our backend
 
 ## Ways we are not DevOps
 
@@ -41,12 +41,10 @@
 - No zero-downtime deployment strategy implemented
   - Missing blue-green or canary deployment capabilities
   - All our deployments require some downtime, even though it might only be for short amounts of time
-    
 
 ### Environment Management
 - There is no automatic configuration for the dev environment, this is done manually
   - Potential inconsistencies between our development environments
-
 
 ### Missing Automation
 - Logging in the backend is not implemented
@@ -57,7 +55,7 @@
 - There is no automatic rollback setup in our system
 
 ## Future Improvements
-- Implement logging in the backend, for easier debugging etc.
+- Implement logging in the backend, for easier debugging etc
 - More in depth metrics for our monitoring stack
 - Implement automatic scaling
 - Implement automatic rollback with f.x Helm

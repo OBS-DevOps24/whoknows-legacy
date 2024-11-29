@@ -42,6 +42,7 @@
     - Missing blue-green or canary deployment capabilities
     - All our deployments require some downtime, even though it might only be for short amounts of time
     
+
 ### Environment Management
 - There is no automatic configuration for the dev environment, this is done manually
     - Potential inconsistencies between our development environments
@@ -55,7 +56,7 @@
 - There is no automatic scaling yet, but this is something we've planned on trying to implement
 - There is no automatic rollback setup in our system
 
-### Future Improvements
+## Future Improvements
 - Implement logging in the backend, for easier debugging etc.
 - More in depth metrics for our monitoring stack
 - Implement automatic scaling

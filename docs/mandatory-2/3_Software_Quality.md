@@ -8,11 +8,11 @@
 
 ## Do you agree with the findings:
 
-Not all, we deemed most of the issues not to be relevant. There where a lot of issues regarding the legacy python code, which we did not fix. We also ignored the duplicate code in the unit tests, since it is necessary to have the same code in multiple tests. Issues regarding the legacy code where ignored, because we where migrating to a new codebase.
+Not all, we deemed most of the issues not to be relevant. There were a lot of issues regarding the legacy python code, which we did not fix. We also ignored the duplicate code in the unit tests, since it is necessary to have the same code in multiple tests. Issues regarding the legacy code were ignored, because we were migrating to a new codebase.
 
 ## Which ones did you fix:
 
-We where only focused on fixing issues regarding the new codebase. Our focus was on the high severity cases. We fixed the following issues:
+We were only focused on fixing issues regarding the new codebase. Our focus was on the high severity cases. We fixed the following issues:
 
 ### API endpoints not returning a response
 
@@ -32,8 +32,8 @@ We where only focused on fixing issues regarding the new codebase. Our focus was
 
 ## Planning to fix
 
-Because of time constraints, we where not able to fix all the issues. We plan to fix the following issues in the future:
+Because of time constraints, we were not able to fix all the issues. We plan to fix the following issues in the future:
 
 - Some rerendering issues for the frontend, causing unnecessary rerendering. We plan to fix this issue by wrapping the component in `useMemo`.
 - Minor issues regarding naming conventions.
-- Insecure configuration for the JWT cookie (marked as low), where the secure property is set to false. This is because we where using HTTP before, and since we are now using HTTPS, we can set the secure property to true.
+- Insecure configuration for the JWT cookie (marked as low), where the secure property is set to false. This is because we were using HTTP before, and since we are now using HTTPS, we can set the secure property to true.

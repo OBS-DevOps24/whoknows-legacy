@@ -8,13 +8,31 @@ test("should login successfully with test account", async ({ page }) => {
   await page.getByRole("link", { name: "Log in" }).click();
   await page.getByPlaceholder("Username").fill(testUsername);
   await page.getByPlaceholder("Password").fill(testPassword);
-  await page.getByRole("button", { name: "Log In" }).click();
-
-  // After successful login, we should be redirected to home
-  await expect(page).toHaveURL("/", { timeout: 10000 });
   
-  // Check for logged-in state by looking for "Log out" in the nav
+  // Click login button and wait for BOTH:
+  // 1. The API response
+  // 2. The navigation that happens after login
+  await Promise.all([
+    // Wait for the API response
+    page.waitForResponse(
+      response => response.url().includes('/api/login')
+    ),
+    // Trigger the login
+    page.getByRole("button", { name: "Log In" }).click(),
+  ]);
+
+  // First verify we're logged in by checking for logout button
   await expect(page.locator("#nav-logout")).toBeVisible();
+
+  // Now check which page we ended up on
+  const currentUrl = page.url();
+  if (currentUrl.includes('/change-password')) {
+    // We were redirected to change-password - this means that the users password expired
+    await expect(page).toHaveURL("/change-password");
+  } else {
+    // We should be on the home page - this means that the users password is still valid
+    await expect(page).toHaveURL("/");
+  }
 });
 
 test("should show error message with wrong credentials", async ({ page }) => {

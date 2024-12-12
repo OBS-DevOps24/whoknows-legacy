@@ -1,0 +1,73 @@
+services:
+  backend:
+    build:
+      context: ./backend/API
+      dockerfile: Dockerfile
+    container_name: backend-container
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8080:8080"
+    environment:
+      - Server=${MYSQL_SERVER} ## host.docker.internal
+      - Port=${MYSQL_PORT} ## 3306
+      - Database=${MYSQL_DATABASE} ## use local database
+      - User=${MYSQL_USER} ## use local mysql user
+      - Pwd=${MYSQL_PASSWORD} ## use local mysql password
+      - Redis=${REDIS_CONNECTION_STRING}
+      - JWT_KEY=${JWT_KEY}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - webnet
+    profiles: ["prod-app"]
+    depends_on:
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-container
+    restart: unless-stopped
+    networks:
+      - webnet
+    ports:
+      - "3000:3000" # Expose port to other services in the same network
+    profiles: ["prod-app"]
+
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    container_name: nginx-container
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - webnet
+    volumes:
+      - /etc/letsencrypt/live/devobs.dk:/etc/letsencrypt/live/devobs.dk
+      - /etc/letsencrypt/archive/devobs.dk:/etc/letsencrypt/archive/devobs.dk
+    profiles: ["prod-app"]
+
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - webnet
+    profiles: ["prod-app"]
+
+networks:
+  webnet:
+    driver: bridge
+
+# For this to work, you'll need to outcomment the 443 ssl in nginx.conf, and use server { listen 80; } 
+# You'll also need to outcomment the ssl_certificate and ssl_certificate_key in nginx.conf
+# You'll also need to outcomment the 301 redirect in nginx.conf

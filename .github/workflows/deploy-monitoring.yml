@@ -3,12 +3,17 @@ name: Deploy Monitoring Stack
 # Triggers on push to main branch that contains changes to monitoring files OR on manual trigger
 on:
   pull_request:
+    types:
+      - closed
+    branches:
+      - master
     paths:
       - 'monitoring/**'
   workflow_dispatch:  # Manual trigger from GitHub UI
 
 jobs:
   deploy:
+    if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

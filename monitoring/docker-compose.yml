@@ -11,6 +11,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention=60d' # change retention days to 60, so we keep our data till the end of the exam :-)))
     ports:
       - "9090:9090"
     networks:

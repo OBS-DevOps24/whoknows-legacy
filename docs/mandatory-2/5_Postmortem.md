@@ -36,7 +36,7 @@ The root cause of the outage was a lack of memory for the database VM.
 ## Lessons Learned
 
 - **Monitoring Effectiveness:** 
-  - Our monitoring stack was instrumental in identifying the issue. 
+  - Our monitoring stack was instrumental in identifying the issue.
   - However, the lack of automated alerting delayed our response time.
 
 ## How to prevent this in the future

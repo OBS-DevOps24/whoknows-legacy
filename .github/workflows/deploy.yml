@@ -68,7 +68,7 @@ jobs:
       - name: Copy docker-compose.yml to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.VM_IP_1 }}
+          host: ${{ secrets.VM_IP_2 }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "docker-compose.yml"

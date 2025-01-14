@@ -46,13 +46,16 @@ jobs:
           envs: |
             GRAFANA_ADMIN_USER,
             GRAFANA_ADMIN_PASSWORD,
-            VM_IP_1
+            VM_IP_1,
+            VM_IP_2
           script: |
             cd ~/monitoring
             echo "GRAFANA_ADMIN_USER=${{ secrets.GRAFANA_ADMIN_USER }}" > .env
             echo "GRAFANA_ADMIN_PASSWORD=${{ secrets.GRAFANA_ADMIN_PASSWORD }}" >> .env
             echo "VM_IP_1=${{ secrets.VM_IP_1 }}" >> .env
+            echo "VM_IP_2=${{ secrets.VM_IP_2 }}" >> .env
             export VM_IP_1=${{ secrets.VM_IP_1 }}
+            export VM_IP_2=${{ secrets.VM_IP_2 }}
             envsubst < prometheus/prometheus.yml.template > prometheus/prometheus.yml
             docker compose pull
             docker compose up -d --remove-orphans

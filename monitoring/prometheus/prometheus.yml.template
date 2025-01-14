@@ -19,6 +19,6 @@ scrape_configs:
     static_configs:
       - targets: ['${VM_IP_1}:9100']
 
- # - job_name: 'database_vm'
- #   static_configs:
- #     - targets: ['VM2-ip:9100']
+  - job_name: 'database_vm'
+    static_configs:
+      - targets: ['${VM_IP_2}:9100']

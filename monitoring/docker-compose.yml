@@ -18,6 +18,7 @@ services:
       - monitoringnet
     environment:
       - VM_IP_1=${VM_IP_1}
+      - VM_IP_2=${VM_IP_2}
     
   grafana:
     image: grafana/grafana:latest
